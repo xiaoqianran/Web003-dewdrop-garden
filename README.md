@@ -15,6 +15,8 @@ GitHub Pages：https://xiaoqianran.github.io/Web003-dewdrop-garden/
 
 右上角 🌙 可切换**黑夜模式**（雾蓝夜空 + 薄荷月光），偏好会记在本机 `localStorage`。
 
+进度会自动存到本机（`dewdrop-save-v1`）。再次打开可「继续照料」；也可在开场页「重新开始」清空进度。
+
 ### 出游地区
 
 | 地区 | 解锁 | 特色 |

@@ -32,6 +32,78 @@
     --dock-h: 72px;
     --safe-b: env(safe-area-inset-bottom, 0px);
     --safe-t: env(safe-area-inset-top, 0px);
+    --surface: rgba(255, 253, 248, 0.82);
+    --surface-soft: rgba(255, 253, 248, 0.6);
+    --border-soft: rgba(255,255,255,0.85);
+    --chip-bg: var(--mint-soft);
+    --chip-border: rgba(111,175,142,0.22);
+    --chip-color: var(--leaf-deep);
+    --gold-bg: #fff6e4;
+    --gold-border: rgba(232,194,122,0.45);
+    --gold-color: #9a7428;
+    --day-bg: #eef4ff;
+    --day-border: rgba(140,170,220,0.35);
+    --day-color: #5a6f96;
+    --seed-active-bg: #dff3e8;
+    --seed-press: #d5efdf;
+    --log-item-bg: rgba(255,255,255,0.55);
+    --weather-bg: rgba(255,255,255,0.65);
+    --plot-label-bg: rgba(255,255,255,0.5);
+    --plot-label-color: rgba(80, 60, 40, 0.7);
+    --dock-fade: linear-gradient(180deg, transparent, rgba(238, 247, 242, 0.92) 28%, rgba(247, 243, 234, 0.96));
+    --dock-bg: rgba(255, 253, 248, 0.92);
+    --action-bg: var(--mint-soft);
+    --action-color: var(--leaf-deep);
+    --sheet-bg: var(--paper);
+    --mask-bg: rgba(50, 70, 60, 0.28);
+    --intro-bg: rgba(232, 245, 238, 0.88);
+    --theme-transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+    color-scheme: light;
+  }
+
+  /* 小清新夜色：雾蓝夜空 + 薄荷月光 */
+  html.night {
+    color-scheme: dark;
+    --sky-top: #1a2430;
+    --sky-mid: #1e2a36;
+    --sky-bottom: #243040;
+    --leaf: #7ec4a0;
+    --leaf-deep: #a8dcc0;
+    --mint: #5a8f78;
+    --mint-soft: rgba(90, 140, 115, 0.28);
+    --paper: #243038;
+    --blush: #d4a09c;
+    --ink: #e6efe9;
+    --ink-soft: #b0c0b6;
+    --ink-mute: #7d9086;
+    --soil: #6b5a48;
+    --soil-wet: #564738;
+    --shadow: rgba(0, 0, 0, 0.35);
+    --surface: rgba(36, 48, 56, 0.88);
+    --surface-soft: rgba(32, 42, 52, 0.72);
+    --border-soft: rgba(140, 180, 160, 0.14);
+    --chip-bg: rgba(90, 140, 115, 0.22);
+    --chip-border: rgba(126, 196, 160, 0.28);
+    --chip-color: #b8e0c8;
+    --gold-bg: rgba(180, 140, 60, 0.22);
+    --gold-border: rgba(220, 180, 90, 0.35);
+    --gold-color: #e8c878;
+    --day-bg: rgba(100, 130, 180, 0.22);
+    --day-border: rgba(140, 170, 220, 0.3);
+    --day-color: #b8c8e8;
+    --seed-active-bg: rgba(90, 150, 120, 0.35);
+    --seed-press: rgba(90, 150, 120, 0.28);
+    --log-item-bg: rgba(0, 0, 0, 0.22);
+    --weather-bg: rgba(0, 0, 0, 0.22);
+    --plot-label-bg: rgba(0, 0, 0, 0.35);
+    --plot-label-color: rgba(230, 220, 200, 0.78);
+    --dock-fade: linear-gradient(180deg, transparent, rgba(20, 28, 36, 0.55) 30%, rgba(20, 28, 36, 0.92));
+    --dock-bg: rgba(28, 38, 46, 0.94);
+    --action-bg: rgba(50, 70, 62, 0.75);
+    --action-color: #c8e8d4;
+    --sheet-bg: #243038;
+    --mask-bg: rgba(8, 12, 18, 0.55);
+    --intro-bg: rgba(20, 30, 38, 0.9);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -53,6 +125,76 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
+    transition: var(--theme-transition);
+  }
+  html.night body {
+    background:
+      radial-gradient(ellipse 70% 45% at 18% 8%, rgba(90, 140, 160, 0.22), transparent 55%),
+      radial-gradient(ellipse 50% 35% at 88% 18%, rgba(120, 100, 160, 0.14), transparent 50%),
+      radial-gradient(circle at 72% 12%, rgba(255, 245, 210, 0.14) 0 1.1%, transparent 2%),
+      linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 48%, var(--sky-bottom) 100%);
+  }
+  html.night .orb.a { background: #eef6ff; opacity: 0.45; }
+  html.night .orb.b { background: #7ec4a0; }
+  html.night .orb.c { background: rgba(220, 235, 255, 0.7); }
+  html.night .orb.d { background: #c9a0c0; }
+  html.night .cloud { background: rgba(160, 180, 200, 0.18); }
+  html.night .garden-sky {
+    background:
+      radial-gradient(circle at 78% 22%, rgba(255, 245, 210, 0.38) 0 2.2%, transparent 3.2%),
+      linear-gradient(180deg, rgba(40, 55, 75, 0.55), transparent 85%) !important;
+  }
+  html.night .garden-panel.theme-mist {
+    background: linear-gradient(180deg, rgba(36, 48, 62, 0.85), rgba(32, 42, 52, 0.72));
+  }
+  html.night .garden-panel.theme-mist .garden-sky {
+    background:
+      radial-gradient(circle at 78% 22%, rgba(200, 220, 255, 0.2) 0 2%, transparent 3%),
+      linear-gradient(180deg, #1c2838 0%, #243040 55%, transparent 100%) !important;
+  }
+  html.night .garden-panel.theme-river {
+    background: linear-gradient(180deg, rgba(28, 48, 52, 0.85), rgba(32, 42, 52, 0.72));
+  }
+  html.night .garden-panel.theme-river .garden-sky {
+    background:
+      radial-gradient(circle at 78% 22%, rgba(180, 230, 240, 0.18) 0 2%, transparent 3%),
+      linear-gradient(180deg, #1a3038 0%, #223840 55%, transparent 100%) !important;
+  }
+  html.night .region-card {
+    background: linear-gradient(135deg, rgba(40, 52, 60, 0.98), rgba(50, 70, 62, 0.45));
+    border-color: rgba(126, 196, 160, 0.22);
+  }
+  html.night .region-card.theme-mist {
+    background: linear-gradient(135deg, #2a3440, #243040);
+    border-color: rgba(140, 165, 190, 0.3);
+  }
+  html.night .region-card.theme-river {
+    background: linear-gradient(135deg, #243840, #1e3438);
+    border-color: rgba(100, 170, 185, 0.3);
+  }
+  html.night .region-card .tag {
+    background: rgba(0, 0, 0, 0.25);
+  }
+  html.night .plot-inner {
+    border-color: rgba(120, 100, 80, 0.35);
+  }
+  html.night .empty-mark {
+    border-color: rgba(200, 190, 170, 0.25);
+  }
+  html.night .seed-count {
+    background: rgba(0, 0, 0, 0.28);
+  }
+  html.night .seed-icon {
+    background: rgba(30, 40, 48, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+  }
+  html.night .toast {
+    background: rgba(220, 235, 225, 0.95);
+    color: #1e2a24;
+  }
+  html.night .intro-card {
+    border-color: rgba(140, 180, 160, 0.18);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
   }
 
   .ambient {
@@ -101,14 +243,45 @@
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
-    background: rgba(255, 253, 248, 0.82);
+    background: var(--surface);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.85);
+    border: 1px solid var(--border-soft);
     border-radius: 20px;
     padding: 10px 12px;
     box-shadow: 0 8px 24px var(--shadow);
     flex-shrink: 0;
+    transition: var(--theme-transition);
+  }
+  .topbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+  }
+  .theme-toggle {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--chip-border);
+    background: var(--chip-bg);
+    color: var(--chip-color);
+    font-size: 1.05rem;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: var(--theme-transition), transform 0.15s ease;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .theme-toggle:active { transform: scale(0.95); }
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--leaf);
+    outline-offset: 2px;
   }
   .brand {
     display: flex;
@@ -162,25 +335,26 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    background: var(--mint-soft);
-    border: 1px solid rgba(111,175,142,0.22);
+    background: var(--chip-bg);
+    border: 1px solid var(--chip-border);
     border-radius: 999px;
     padding: 7px 6px;
     font-size: 0.78rem;
     font-weight: 500;
-    color: var(--leaf-deep);
+    color: var(--chip-color);
     white-space: nowrap;
     min-width: 0;
+    transition: var(--theme-transition);
   }
   .chip.gold {
-    background: #fff6e4;
-    border-color: rgba(232,194,122,0.45);
-    color: #9a7428;
+    background: var(--gold-bg);
+    border-color: var(--gold-border);
+    color: var(--gold-color);
   }
   .chip.day {
-    background: #eef4ff;
-    border-color: rgba(140,170,220,0.35);
-    color: #5a6f96;
+    background: var(--day-bg);
+    border-color: var(--day-border);
+    color: var(--day-color);
   }
   .chip .icon { font-size: 0.9rem; line-height: 1; flex-shrink: 0; }
 
@@ -195,14 +369,15 @@
 
   .garden-panel {
     position: relative;
-    background: rgba(255, 253, 248, 0.6);
-    border: 1px solid rgba(255,255,255,0.85);
+    background: var(--surface-soft);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius-lg);
     box-shadow: 0 10px 28px var(--shadow);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
+    transition: var(--theme-transition);
   }
   .garden-sky {
     position: absolute;
@@ -266,12 +441,12 @@
     display: none;
     align-items: center;
     gap: 6px;
-    background: rgba(255,255,255,0.65);
+    background: var(--weather-bg);
     border-radius: 999px;
     padding: 6px 10px;
     font-size: 0.72rem;
     color: var(--ink-soft);
-    border: 1px solid rgba(255,255,255,0.9);
+    border: 1px solid var(--border-soft);
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -440,8 +615,8 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 0.58rem;
-    color: rgba(80, 60, 40, 0.7);
-    background: rgba(255,255,255,0.5);
+    color: var(--plot-label-color);
+    background: var(--plot-label-bg);
     padding: 1px 5px;
     border-radius: 999px;
     white-space: nowrap;
@@ -488,13 +663,14 @@
     gap: 10px;
   }
   .card {
-    background: rgba(255, 253, 248, 0.82);
+    background: var(--surface);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.9);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius-md);
     box-shadow: 0 6px 18px var(--shadow);
     padding: 12px;
+    transition: var(--theme-transition);
   }
   .card h3 {
     font-family: var(--font-display);
@@ -542,10 +718,10 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
-  .seed-btn:active { background: #d5efdf; }
+  .seed-btn:active { background: var(--seed-press); }
   .seed-btn.active {
     border-color: var(--leaf);
-    background: #dff3e8;
+    background: var(--seed-active-bg);
     box-shadow: 0 0 0 3px rgba(111,175,142,0.15);
   }
   .seed-btn:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
@@ -602,7 +778,7 @@
     -webkit-overflow-scrolling: touch;
   }
   .log-body p {
-    background: rgba(255,255,255,0.55);
+    background: var(--log-item-bg);
     border-radius: 10px;
     padding: 6px 8px;
     border-left: 3px solid var(--mint);
@@ -625,8 +801,9 @@
     justify-content: center;
     gap: 8px;
     padding: 10px var(--pad) calc(10px + var(--safe-b));
-    background: linear-gradient(180deg, transparent, rgba(238, 247, 242, 0.92) 28%, rgba(247, 243, 234, 0.96));
+    background: var(--dock-fade);
     pointer-events: none;
+    transition: var(--theme-transition);
   }
   .dock-inner {
     pointer-events: auto;
@@ -634,18 +811,19 @@
     width: 100%;
     max-width: 480px;
     gap: 8px;
-    background: rgba(255, 253, 248, 0.92);
+    background: var(--dock-bg);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.95);
+    border: 1px solid var(--border-soft);
     border-radius: 999px;
     padding: 8px;
-    box-shadow: 0 8px 28px rgba(77, 110, 90, 0.16);
+    box-shadow: 0 8px 28px var(--shadow);
+    transition: var(--theme-transition);
   }
   .action {
     border: none;
-    background: var(--mint-soft);
-    color: var(--leaf-deep);
+    background: var(--action-bg);
+    color: var(--action-color);
     font: inherit;
     font-size: 0.8rem;
     font-weight: 500;
@@ -710,13 +888,13 @@
     position: fixed;
     inset: 0;
     z-index: 30;
-    background: rgba(232, 245, 238, 0.88);
+    background: var(--intro-bg);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: grid;
     place-items: center;
     padding: max(16px, var(--safe-t)) 16px max(16px, var(--safe-b));
-    transition: opacity 0.4s ease;
+    transition: opacity 0.4s ease, background 0.35s ease;
   }
   .intro.hide {
     opacity: 0;
@@ -727,9 +905,10 @@
     background: var(--paper);
     border-radius: 24px;
     padding: 24px 20px 20px;
-    box-shadow: 0 16px 40px rgba(90, 120, 100, 0.18);
-    border: 1px solid rgba(255,255,255,0.95);
+    box-shadow: 0 16px 40px var(--shadow);
+    border: 1px solid var(--border-soft);
     text-align: center;
+    transition: var(--theme-transition);
   }
   .intro-card .badge {
     display: inline-block;
@@ -781,6 +960,7 @@
       border-radius: 999px;
       padding: 10px 14px 10px 16px;
     }
+    .topbar-row { flex: 1; min-width: 0; }
     .brand p { display: block; }
     .brand h1 { font-size: 1.3rem; }
     .logo { width: 40px; height: 40px; }
@@ -873,8 +1053,8 @@
     justify-content: flex-end;
   }
   .travel-btn {
-    border: 1px solid rgba(111,175,142,0.35);
-    background: rgba(255,253,248,0.92);
+    border: 1px solid var(--chip-border);
+    background: var(--surface);
     color: var(--leaf-deep);
     font: inherit;
     font-size: 0.78rem;
@@ -902,7 +1082,7 @@
     position: fixed;
     inset: 0;
     z-index: 25;
-    background: rgba(50, 70, 60, 0.28);
+    background: var(--mask-bg);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     opacity: 0;
@@ -920,7 +1100,7 @@
     bottom: 0;
     z-index: 26;
     max-height: min(78dvh, 640px);
-    background: var(--paper);
+    background: var(--sheet-bg);
     border-radius: 22px 22px 0 0;
     box-shadow: 0 -12px 40px rgba(60, 90, 70, 0.18);
     padding:
@@ -1086,12 +1266,15 @@
 
   <div class="app">
     <header class="topbar">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <h1>露珠小院</h1>
-          <p>DEWDROP COURTYARD</p>
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>露珠小院</h1>
+            <p>DEWDROP COURTYARD</p>
+          </div>
         </div>
+        <button class="theme-toggle" id="btnTheme" type="button" aria-label="切换黑夜模式" title="黑夜模式">🌙</button>
       </div>
       <div class="stats">
         <div class="chip gold" title="金币"><span class="icon">◎</span><span id="coins">48</span></div>
@@ -1157,6 +1340,17 @@
   <div class="toast" id="toast" role="status"></div>
 
   <script>
+    // 尽早应用主题，减少闪白
+    (function () {
+      try {
+        const saved = localStorage.getItem("dewdrop-theme");
+        const preferNight =
+          saved === "night" ||
+          (!saved && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (preferNight) document.documentElement.classList.add("night");
+      } catch (e) {}
+    })();
+
     const SEEDS = {
       blush: {
         id: "blush",
@@ -1284,7 +1478,31 @@
       regionTitle: document.getElementById("regionTitle"),
       regionWeather: document.getElementById("regionWeather"),
       gardenPanel: document.getElementById("gardenPanel"),
+      btnTheme: document.getElementById("btnTheme"),
     };
+
+    function isNight() {
+      return document.documentElement.classList.contains("night");
+    }
+
+    function applyTheme(night) {
+      document.documentElement.classList.toggle("night", !!night);
+      if (el.btnTheme) {
+        el.btnTheme.textContent = night ? "☀" : "🌙";
+        el.btnTheme.setAttribute("aria-label", night ? "切换日间模式" : "切换黑夜模式");
+        el.btnTheme.title = night ? "日间模式" : "黑夜模式";
+      }
+      try {
+        localStorage.setItem("dewdrop-theme", night ? "night" : "day");
+      } catch (e) {}
+    }
+
+    function toggleTheme() {
+      const next = !isNight();
+      applyTheme(next);
+      toast(next ? "夜色轻柔，月光落在花圃上" : "晨光回来了");
+      log(next ? "点亮了夜色模式" : "切回日间模式");
+    }
 
     function currentRegion() {
       return REGIONS[state.regionId];
@@ -1663,12 +1881,14 @@
     el.btnTravel.addEventListener("click", openMap);
     el.btnCloseMap.addEventListener("click", closeMap);
     el.sheetMask.addEventListener("click", closeMap);
+    el.btnTheme.addEventListener("click", toggleTheme);
 
     el.startBtn.addEventListener("click", () => {
       el.intro.classList.add("hide");
       log("推开院门，晨光落在南窗花圃上");
     });
 
+    applyTheme(isNight());
     renderAll();
     log("小院已经准备好了。照料两天后，可以出游雾丘与河岸");
   </script>

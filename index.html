@@ -1070,6 +1070,20 @@
     -webkit-tap-highlight-color: transparent;
   }
   .intro-card .start:active { filter: brightness(0.97); }
+  .intro-card .start.ghost {
+    margin-top: 10px;
+    background: transparent;
+    color: var(--leaf-deep);
+    border: 1px solid var(--chip-border);
+    box-shadow: none;
+  }
+  .intro-card .start.ghost:active { background: var(--surface-soft); }
+  .intro-card .intro-save {
+    margin-top: 12px;
+    font-size: var(--fs-xs);
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
 
   /* —— tablet / desktop —— */
   @media (min-width: 640px) {
@@ -1575,6 +1589,8 @@
         就能推开院门出游——雾丘与河岸各有不同的花。
       </p>
       <button class="start" id="startBtn" type="button">推开院门</button>
+      <button class="start ghost" id="resetBtn" type="button" hidden>重新开始</button>
+      <p class="intro-save" id="introSaveHint" hidden>检测到本机存档，可继续照料小院。</p>
     </div>
   </div>
 
@@ -1766,30 +1782,164 @@
     const TEA_COST = 15;
     const TEA_ENERGY = 4;
 
-    const state = {
-      coins: 48,
-      energy: 12,
-      maxEnergy: 16,
-      day: 1,
-      regionId: "home",
-      selectedSeed: "blush",
-      selectedPlot: null,
-      inventory: { blush: 3, mint: 2, mist: 1, river: 1 },
-      flowers: { blush: 0, mint: 0, mist: 0, river: 0 },
-      marketTab: "buy",
-      regionPlots: {
-        home: makePlots(9),
-        mist: makePlots(6),
-        river: makePlots(6),
-      },
-    };
+    const SAVE_KEY = "dewdrop-save-v1";
+    const SAVE_VERSION = 1;
 
-    // starter plant in home center
-    state.regionPlots.home[4].plant = {
-      seedId: "blush",
-      stage: 1,
-      wateredToday: false,
-    };
+    function defaultState() {
+      const s = {
+        coins: 48,
+        energy: 12,
+        maxEnergy: 16,
+        day: 1,
+        regionId: "home",
+        selectedSeed: "blush",
+        selectedPlot: null,
+        inventory: { blush: 3, mint: 2, mist: 1, river: 1 },
+        flowers: { blush: 0, mint: 0, mist: 0, river: 0 },
+        marketTab: "buy",
+        regionPlots: {
+          home: makePlots(9),
+          mist: makePlots(6),
+          river: makePlots(6),
+        },
+      };
+      // starter plant in home center
+      s.regionPlots.home[4].plant = {
+        seedId: "blush",
+        stage: 1,
+        wateredToday: false,
+      };
+      return s;
+    }
+
+    const state = defaultState();
+
+    function serializeState() {
+      return {
+        v: SAVE_VERSION,
+        coins: state.coins,
+        energy: state.energy,
+        maxEnergy: state.maxEnergy,
+        day: state.day,
+        regionId: state.regionId,
+        selectedSeed: state.selectedSeed,
+        inventory: { ...state.inventory },
+        flowers: { ...state.flowers },
+        regionPlots: Object.fromEntries(
+          Object.entries(state.regionPlots).map(([rid, plots]) => [
+            rid,
+            plots.map((p) => ({
+              id: p.id,
+              plant: p.plant
+                ? {
+                    seedId: p.plant.seedId,
+                    stage: p.plant.stage,
+                    wateredToday: !!p.plant.wateredToday,
+                  }
+                : null,
+            })),
+          ])
+        ),
+      };
+    }
+
+    function saveGame() {
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(serializeState()));
+      } catch (_) {
+        /* private mode / quota */
+      }
+    }
+
+    function hasSave() {
+      try {
+        return !!localStorage.getItem(SAVE_KEY);
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function loadGame() {
+      try {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data || data.v !== SAVE_VERSION) return false;
+
+        state.coins = Math.max(0, Number(data.coins) || 0);
+        state.energy = Math.max(0, Number(data.energy) || 0);
+        state.maxEnergy = Math.max(1, Number(data.maxEnergy) || 16);
+        state.day = Math.max(1, Number(data.day) || 1);
+        state.regionId = REGIONS[data.regionId] ? data.regionId : "home";
+        state.selectedSeed = SEEDS[data.selectedSeed]
+          ? data.selectedSeed
+          : "blush";
+        state.selectedPlot = null;
+        state.marketTab = "buy";
+
+        state.inventory = { blush: 0, mint: 0, mist: 0, river: 0 };
+        if (data.inventory && typeof data.inventory === "object") {
+          Object.keys(state.inventory).forEach((k) => {
+            state.inventory[k] = Math.max(0, Number(data.inventory[k]) || 0);
+          });
+        }
+
+        state.flowers = { blush: 0, mint: 0, mist: 0, river: 0 };
+        if (data.flowers && typeof data.flowers === "object") {
+          Object.keys(state.flowers).forEach((k) => {
+            state.flowers[k] = Math.max(0, Number(data.flowers[k]) || 0);
+          });
+        }
+
+        Object.keys(REGIONS).forEach((rid) => {
+          const count = REGIONS[rid].plotCount;
+          const saved = data.regionPlots && data.regionPlots[rid];
+          const plots = makePlots(count);
+          if (Array.isArray(saved)) {
+            for (let i = 0; i < count; i++) {
+              const sp = saved[i];
+              if (!sp) continue;
+              if (sp.plant && SEEDS[sp.plant.seedId]) {
+                plots[i].plant = {
+                  seedId: sp.plant.seedId,
+                  stage: Math.min(2, Math.max(0, Number(sp.plant.stage) || 0)),
+                  wateredToday: !!sp.plant.wateredToday,
+                };
+              }
+            }
+          }
+          state.regionPlots[rid] = plots;
+        });
+
+        // keep selected seed plantable in current region if possible
+        const region = REGIONS[state.regionId];
+        if (region && !region.seedIds.includes(state.selectedSeed)) {
+          state.selectedSeed = region.seedIds[0];
+        }
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function clearSave() {
+      try {
+        localStorage.removeItem(SAVE_KEY);
+      } catch (_) {}
+    }
+
+    function resetGame() {
+      clearSave();
+      const fresh = defaultState();
+      Object.keys(fresh).forEach((k) => {
+        state[k] = fresh[k];
+      });
+      // deep replace regionPlots
+      state.regionPlots = fresh.regionPlots;
+      state.inventory = fresh.inventory;
+      state.flowers = fresh.flowers;
+      saveGame();
+    }
 
     const stageLabel = ["嫩芽", "花苞", "盛开"];
 
@@ -1805,6 +1955,8 @@
       toast: document.getElementById("toast"),
       intro: document.getElementById("intro"),
       startBtn: document.getElementById("startBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      introSaveHint: document.getElementById("introSaveHint"),
       btnWater: document.getElementById("btnWater"),
       btnHarvest: document.getElementById("btnHarvest"),
       btnRest: document.getElementById("btnRest"),
@@ -2247,6 +2399,7 @@
       el.energy.textContent = state.energy;
       el.energyMax.textContent = state.maxEnergy;
       el.day.textContent = state.day;
+      saveGame();
       const plots = currentPlots();
       const sel = state.selectedPlot != null ? plots[state.selectedPlot] : null;
       el.btnWater.disabled = !sel || !sel.plant || sel.plant.stage >= 2;
@@ -2445,14 +2598,58 @@
       refreshMarketBtn();
     };
 
+    const loaded = loadGame();
+
+    function prepareIntro() {
+      if (loaded) {
+        el.startBtn.textContent = "继续照料";
+        el.resetBtn.hidden = false;
+        el.introSaveHint.hidden = false;
+        el.introSaveHint.textContent = `本机存档 · 第 ${state.day} 天 · ◎ ${state.coins}`;
+      } else {
+        el.startBtn.textContent = "推开院门";
+        el.resetBtn.hidden = true;
+        el.introSaveHint.hidden = true;
+      }
+    }
+
     el.startBtn.addEventListener("click", () => {
       el.intro.classList.add("hide");
-      log("推开院门，晨光落在南窗花圃上");
+      if (loaded) {
+        log(`推开院门，继续第 ${state.day} 天的小院时光`);
+        el.hint.textContent = "欢迎回来。花圃还在等你照料";
+      } else {
+        log("推开院门，晨光落在南窗花圃上");
+      }
+      saveGame();
+    });
+
+    el.resetBtn.addEventListener("click", () => {
+      if (!confirm("确定重新开始？当前本机进度会清空。")) return;
+      resetGame();
+      el.intro.classList.add("hide");
+      el.log.innerHTML = "";
+      log("重新推开院门，一切从南窗花圃开始");
+      toast("已重新开始");
+      el.hint.textContent = "先从下方选一颗种子，再点空地播种";
+      renderAll();
+      saveGame();
+    });
+
+    // 离开页面时再存一次
+    window.addEventListener("pagehide", saveGame);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") saveGame();
     });
 
     applyTheme(isNight());
+    prepareIntro();
     renderAll();
-    log("小院已经准备好了。照料两天后，市贸开张，也可出游雾丘与河岸");
+    if (loaded) {
+      log("读档成功——小院还记得你上次离开时的样子");
+    } else {
+      log("小院已经准备好了。照料两天后，市贸开张，也可出游雾丘与河岸");
+    }
   </script>
 </body>
 </html>

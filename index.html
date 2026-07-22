@@ -2,208 +2,789 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>露珠小院</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>露珠小院 · Dewdrop Courtyard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-    color: #333;
-    background: #f5f5f5;
-    min-height: 100vh;
-    padding: 16px;
+  :root {
+    --sky-top: #d8efe8;
+    --sky-mid: #eef7f2;
+    --sky-bottom: #f7f3ea;
+    --leaf: #6faf8e;
+    --leaf-deep: #4d8a6a;
+    --mint: #b8dfc9;
+    --mint-soft: #e4f4eb;
+    --paper: #fffdf8;
+    --blush: #f3c4c0;
+    --ink: #3d4a42;
+    --ink-soft: #6b7a71;
+    --ink-mute: #9aaba1;
+    --soil: #c9b29a;
+    --soil-wet: #a89078;
+    --shadow: rgba(77, 110, 90, 0.12);
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --font-display: "ZCOOL XiaoWei", "Songti SC", serif;
+    --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   }
-  .app { max-width: 960px; margin: 0 auto; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(184, 223, 201, 0.55), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 85% 20%, rgba(243, 196, 192, 0.28), transparent 50%),
+      linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 42%, var(--sky-bottom) 100%);
+    overflow: hidden;
+    min-height: 100vh;
+  }
+
+  .ambient {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: 0.55;
+    animation: floaty ease-in-out infinite;
+  }
+  .orb.a { width: 10px; height: 10px; background: #fff; left: 12%; top: 18%; animation-duration: 9s; }
+  .orb.b { width: 7px; height: 7px; background: var(--mint); left: 78%; top: 28%; animation-duration: 11s; animation-delay: -2s; }
+  .orb.c { width: 12px; height: 12px; background: rgba(255,255,255,0.8); left: 55%; top: 12%; animation-duration: 13s; animation-delay: -4s; }
+  .orb.d { width: 6px; height: 6px; background: var(--blush); left: 30%; top: 40%; animation-duration: 10s; animation-delay: -1s; }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0) translateX(0); opacity: 0.35; }
+    50% { transform: translateY(-18px) translateX(8px); opacity: 0.75; }
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+    height: 100vh;
+    padding: 18px 18px 22px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 14px;
+  }
+
   .topbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background: #fff;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 12px;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255, 253, 248, 0.72);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 999px;
+    padding: 10px 14px 10px 18px;
+    box-shadow: 0 8px 28px var(--shadow);
   }
-  .topbar h1 { font-size: 1.2rem; font-weight: 600; }
-  .stats { display: flex; gap: 12px; font-size: 0.9rem; }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 35% 30%, #fff 0 18%, transparent 19%),
+      radial-gradient(circle at 50% 55%, #9fd4b5 0 42%, #6faf8e 43% 70%, #4d8a6a 71%);
+    box-shadow: inset 0 -4px 8px rgba(0,0,0,0.08), 0 4px 10px rgba(111,175,142,0.35);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .logo::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 11px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: rgba(255,255,255,0.85);
+    right: 8px;
+    top: 8px;
+    transform: rotate(18deg);
+  }
+  .brand h1 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+  .brand p {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em;
+  }
+  .stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--mint-soft);
+    border: 1px solid rgba(111,175,142,0.22);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--leaf-deep);
+    white-space: nowrap;
+  }
+  .chip.gold {
+    background: #fff6e4;
+    border-color: rgba(232,194,122,0.45);
+    color: #9a7428;
+  }
+  .chip.day {
+    background: #eef4ff;
+    border-color: rgba(140,170,220,0.35);
+    color: #5a6f96;
+  }
+  .chip .icon { font-size: 0.95rem; line-height: 1; }
+
   .stage {
     display: grid;
     grid-template-columns: 1fr 220px;
-    gap: 12px;
+    gap: 14px;
+    min-height: 0;
   }
-  .garden-panel, .card {
-    background: #fff;
-    border-radius: 8px;
-    padding: 16px;
+  @media (max-width: 760px) {
+    .stage { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+    .side { order: 2; }
   }
-  .garden-panel h2, .card h3 {
-    font-size: 1rem;
-    margin-bottom: 12px;
+
+  .garden-panel {
+    position: relative;
+    background: rgba(255, 253, 248, 0.55);
+    border: 1px solid rgba(255,255,255,0.85);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 12px 40px var(--shadow);
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
-  .hint { font-size: 0.8rem; color: #888; margin-bottom: 12px; }
-  .plots {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+  .garden-sky {
+    position: absolute;
+    inset: 0 0 42% 0;
+    background:
+      radial-gradient(circle at 78% 28%, rgba(255,255,255,0.7) 0 8%, transparent 9%),
+      linear-gradient(180deg, rgba(190, 226, 214, 0.5), transparent 80%);
+    pointer-events: none;
+  }
+  .cloud {
+    position: absolute;
+    background: rgba(255,255,255,0.55);
+    border-radius: 999px;
+    animation: drift linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: "";
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+  }
+  .cloud.c1 {
+    width: 70px; height: 22px; top: 18%; left: -80px;
+    animation-duration: 42s;
+  }
+  .cloud.c1::before { width: 28px; height: 28px; top: -14px; left: 12px; }
+  .cloud.c1::after { width: 36px; height: 30px; top: -16px; left: 30px; }
+  .cloud.c2 {
+    width: 90px; height: 26px; top: 28%; left: -120px;
+    animation-duration: 56s; animation-delay: -20s; opacity: 0.7;
+  }
+  .cloud.c2::before { width: 34px; height: 34px; top: -16px; left: 16px; }
+  .cloud.c2::after { width: 42px; height: 36px; top: -18px; left: 38px; }
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(100vw + 200px)); }
+  }
+
+  .garden-header {
+    position: relative;
+    z-index: 2;
+    padding: 16px 18px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     gap: 10px;
   }
-  .plot {
-    aspect-ratio: 1;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #f0ebe3;
-    cursor: pointer;
-    font: inherit;
+  .garden-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 400;
+  }
+  .garden-header .hint {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .weather {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    color: #666;
+    gap: 6px;
+    background: rgba(255,255,255,0.65);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    border: 1px solid rgba(255,255,255,0.9);
   }
-  .plot.selected { outline: 2px solid #4a90a4; }
-  .plot.wet { background: #d8d0c4; }
-  .seed-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .plots {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 8px 18px 18px;
+    align-content: center;
+    min-height: 0;
+  }
+
+  .plot {
+    aspect-ratio: 1;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    border-radius: 22px;
+    transition: transform 0.2s ease;
+  }
+  .plot:hover { transform: translateY(-3px); }
+  .plot:focus-visible {
+    outline: 2px solid var(--leaf);
+    outline-offset: 3px;
+  }
+  .plot-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 22px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.35), transparent 40%),
+      linear-gradient(180deg, #e8d7c2 0%, var(--soil) 55%, #b79a7e 100%);
+    border: 2px solid rgba(255,255,255,0.55);
+    box-shadow:
+      inset 0 8px 16px rgba(255,255,255,0.25),
+      inset 0 -10px 18px rgba(120, 90, 60, 0.12),
+      0 10px 20px rgba(120, 100, 70, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 14%;
+    position: relative;
+    overflow: hidden;
+  }
+  .plot.wet .plot-inner {
+    background:
+      linear-gradient(180deg, rgba(160,200,180,0.2), transparent 35%),
+      linear-gradient(180deg, #d4c0a8 0%, var(--soil-wet) 55%, #8f755c 100%);
+  }
+  .plot.selected .plot-inner {
+    box-shadow:
+      inset 0 8px 16px rgba(255,255,255,0.25),
+      0 0 0 3px rgba(111,175,142,0.55),
+      0 12px 24px rgba(111,175,142,0.2);
+  }
+
+  .plant {
+    position: absolute;
+    left: 50%;
+    bottom: 28%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .sprout {
+    width: 10px;
+    height: 18px;
+    background: linear-gradient(180deg, #8fd0a6, #5a9a74);
+    border-radius: 8px 8px 2px 2px;
+    position: relative;
+  }
+  .sprout::before, .sprout::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 9px;
+    background: #7fc494;
+    border-radius: 50% 0 50% 50%;
+    top: 2px;
+  }
+  .sprout::before { left: -10px; transform: rotate(-30deg); }
+  .sprout::after { right: -10px; transform: scaleX(-1) rotate(-30deg); border-radius: 0 50% 50% 50%; }
+
+  .bud { width: 22px; height: 28px; position: relative; }
+  .bud .stem {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 5px;
+    height: 18px;
+    background: linear-gradient(180deg, #7fc494, #4d8a6a);
+    border-radius: 3px;
+    transform: translateX(-50%);
+  }
+  .bud .head {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff5, transparent 40%),
+                radial-gradient(circle at 50% 50%, #f7b8b4, #e88984);
+    transform: translateX(-50%);
+  }
+
+  .bloom { width: 48px; height: 48px; position: relative; }
+  .bloom .stem {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 6px;
+    height: 22px;
+    background: linear-gradient(180deg, #8fd0a6, #4d8a6a);
+    border-radius: 3px;
+    transform: translateX(-50%);
+  }
+  .bloom .petal {
+    position: absolute;
+    width: 16px;
+    height: 20px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    left: 50%;
+    top: 4px;
+    transform-origin: center 18px;
+  }
+  .bloom .petal:nth-child(1) { background: #f6c8c4; transform: translateX(-50%) rotate(0deg); }
+  .bloom .petal:nth-child(2) { background: #f3b7b2; transform: translateX(-50%) rotate(72deg); }
+  .bloom .petal:nth-child(3) { background: #f6c8c4; transform: translateX(-50%) rotate(144deg); }
+  .bloom .petal:nth-child(4) { background: #f3b7b2; transform: translateX(-50%) rotate(216deg); }
+  .bloom .petal:nth-child(5) { background: #f8d4d0; transform: translateX(-50%) rotate(288deg); }
+  .bloom .center {
+    position: absolute;
+    left: 50%;
+    top: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffe9a8, #e8c27a);
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  .bloom.mint .petal:nth-child(1),
+  .bloom.mint .petal:nth-child(3),
+  .bloom.mint .petal:nth-child(5) { background: #b8dfc9; }
+  .bloom.mint .petal:nth-child(2),
+  .bloom.mint .petal:nth-child(4) { background: #9fd4b5; }
+
+  .plot-label {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.68rem;
+    color: rgba(80, 60, 40, 0.65);
+    background: rgba(255,255,255,0.45);
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .empty-mark {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28px;
+    height: 28px;
+    border: 2px dashed rgba(120, 100, 80, 0.28);
+    border-radius: 50%;
+    opacity: 0.7;
+  }
+  .dew {
+    position: absolute;
+    width: 8px;
+    height: 10px;
+    background: rgba(180, 230, 220, 0.85);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    left: 50%;
+    top: 18%;
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .plot.watering .dew { animation: drip 0.8s ease forwards; }
+  @keyframes drip {
+    0% { opacity: 0; top: 12%; }
+    20% { opacity: 1; }
+    100% { opacity: 0; top: 55%; }
+  }
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+  }
+  .card {
+    background: rgba(255, 253, 248, 0.78);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 24px var(--shadow);
+    padding: 14px;
+  }
+  .card h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card h3 span {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+  .seed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
   .seed-btn {
-    border: 1px solid #ddd;
-    background: #fafafa;
-    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: 1.5px solid transparent;
+    background: var(--mint-soft);
+    border-radius: 14px;
     padding: 8px 10px;
-    text-align: left;
     cursor: pointer;
     font: inherit;
+    color: inherit;
+    text-align: left;
   }
-  .seed-btn.active { border-color: #4a90a4; background: #eef6f8; }
+  .seed-btn.active {
+    border-color: var(--leaf);
+    background: #dff3e8;
+  }
+  .seed-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .seed-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--paper);
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+  }
+  .seed-meta { flex: 1; min-width: 0; }
+  .seed-meta strong {
+    display: block;
+    font-size: 0.86rem;
+    font-weight: 500;
+  }
+  .seed-meta small {
+    color: var(--ink-soft);
+    font-size: 0.72rem;
+  }
+  .seed-count {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--leaf-deep);
+    background: rgba(255,255,255,0.7);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .log {
+    flex: 1;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+  }
   .log-body {
-    font-size: 0.8rem;
-    color: #666;
-    max-height: 160px;
+    flex: 1;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    line-height: 1.45;
+    max-height: 180px;
   }
-  .log-body p { margin-bottom: 6px; }
+  .log-body p {
+    background: rgba(255,255,255,0.55);
+    border-radius: 10px;
+    padding: 6px 8px;
+    border-left: 3px solid var(--mint);
+  }
   .log-body p em {
     font-style: normal;
-    color: #999;
+    color: var(--ink-mute);
+    font-size: 0.7rem;
     margin-right: 4px;
-    font-size: 0.75rem;
   }
+
   .dock {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-top: 12px;
+    flex-wrap: wrap;
+    background: rgba(255, 253, 248, 0.78);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 999px;
+    padding: 10px;
+    box-shadow: 0 10px 32px var(--shadow);
+  }
+  .dock-inner {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
   }
   .action {
-    border: 1px solid #ccc;
-    background: #fff;
-    border-radius: 6px;
-    padding: 10px 18px;
-    cursor: pointer;
+    border: none;
+    background: var(--mint-soft);
+    color: var(--leaf-deep);
     font: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-radius: 999px;
+    padding: 12px 18px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 108px;
+    justify-content: center;
   }
   .action.primary {
-    background: #4a90a4;
-    border-color: #4a90a4;
+    background: linear-gradient(180deg, #8fc9a8, var(--leaf));
     color: #fff;
+    box-shadow: 0 6px 16px rgba(111,175,142,0.35);
   }
   .action:disabled { opacity: 0.45; cursor: not-allowed; }
+  .action .emoji { font-size: 0.95rem; }
+
   .toast {
     position: fixed;
     left: 50%;
-    bottom: 80px;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.8);
+    bottom: 100px;
+    transform: translateX(-50%) translateY(12px);
+    background: rgba(61, 74, 66, 0.92);
     color: #fff;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 0.86rem;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 20;
   }
-  .toast.show { opacity: 1; }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   .intro {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.4);
+    z-index: 30;
+    background: rgba(232, 245, 238, 0.82);
+    backdrop-filter: blur(8px);
     display: grid;
     place-items: center;
-    z-index: 10;
-  }
-  .intro.hide { display: none; }
-  .intro-card {
-    background: #fff;
-    border-radius: 12px;
     padding: 24px;
-    width: min(360px, 90vw);
+    transition: opacity 0.4s ease;
+  }
+  .intro.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .intro-card {
+    width: min(420px, 100%);
+    background: var(--paper);
+    border-radius: 28px;
+    padding: 28px 26px 22px;
+    box-shadow: 0 20px 50px rgba(90, 120, 100, 0.18);
+    border: 1px solid rgba(255,255,255,0.95);
     text-align: center;
   }
-  .intro-card h2 { margin-bottom: 8px; }
-  .intro-card p { color: #666; font-size: 0.9rem; margin-bottom: 16px; line-height: 1.5; }
+  .intro-card .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--leaf-deep);
+    background: var(--mint-soft);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  .intro-card h2 {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+  .intro-card p {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    margin-bottom: 18px;
+  }
   .intro-card .start {
     border: none;
-    background: #4a90a4;
+    background: linear-gradient(180deg, #8fc9a8, var(--leaf));
     color: #fff;
-    padding: 10px 24px;
-    border-radius: 6px;
-    cursor: pointer;
     font: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 12px 28px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(111,175,142,0.35);
   }
-  @media (max-width: 760px) {
-    .stage { grid-template-columns: 1fr; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 </style>
 </head>
 <body>
+  <div class="ambient" aria-hidden="true">
+    <div class="orb a"></div>
+    <div class="orb b"></div>
+    <div class="orb c"></div>
+    <div class="orb d"></div>
+  </div>
+
   <div class="intro" id="intro">
     <div class="intro-card">
+      <div class="badge">小清新 · 休闲养成</div>
       <h2>露珠小院</h2>
-      <p>选种子、点空地播种，浇水过夜后收获。</p>
-      <button class="start" id="startBtn" type="button">开始</button>
+      <p>
+        清晨的露水还挂在叶片上。选一颗种子，点一下空地种下，
+        再轻轻浇水——花朵会慢慢从嫩芽长成。收获后能换新种子。
+      </p>
+      <button class="start" id="startBtn" type="button">推开院门</button>
     </div>
   </div>
 
   <div class="app">
     <header class="topbar">
-      <h1>露珠小院</h1>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>露珠小院</h1>
+          <p>DEWDROP COURTYARD</p>
+        </div>
+      </div>
       <div class="stats">
-        <span>金币 <span id="coins">48</span></span>
-        <span>体力 <span id="energy">12</span>/<span id="energyMax">16</span></span>
-        <span>第 <span id="day">1</span> 天</span>
+        <div class="chip gold" title="金币"><span class="icon">◎</span><span id="coins">48</span></div>
+        <div class="chip" title="体力"><span class="icon">✧</span><span id="energy">12</span>/<span id="energyMax">16</span></div>
+        <div class="chip day" title="天数"><span class="icon">☀</span>第<span id="day">1</span>天</div>
       </div>
     </header>
 
     <main class="stage">
-      <section class="garden-panel">
-        <h2>南窗花圃</h2>
-        <p class="hint" id="statusHint">先选种子，再点空地播种</p>
-        <div class="plots" id="plots"></div>
+      <section class="garden-panel" aria-label="花园">
+        <div class="garden-sky" aria-hidden="true">
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
+        </div>
+        <div class="garden-header">
+          <div>
+            <h2>南窗花圃</h2>
+            <p class="hint" id="statusHint">先从下方选一颗种子，再点空地播种</p>
+          </div>
+          <div class="weather">☁ 微风 · 适宜生长</div>
+        </div>
+        <div class="plots" id="plots" role="grid" aria-label="九块花圃"></div>
       </section>
-      <aside>
-        <div class="card" style="margin-bottom:12px">
-          <h3>种子袋</h3>
+
+      <aside class="side">
+        <div class="card">
+          <h3>种子袋 <span>点选后播种</span></h3>
           <div class="seed-list" id="seedList"></div>
         </div>
-        <div class="card">
-          <h3>小院手记</h3>
+        <div class="card log">
+          <h3>小院手记 <span>刚才发生的事</span></h3>
           <div class="log-body" id="log"></div>
         </div>
       </aside>
     </main>
-
-    <nav class="dock">
-      <button class="action" id="btnWater" type="button">浇水</button>
-      <button class="action primary" id="btnHarvest" type="button">收获</button>
-      <button class="action" id="btnRest" type="button">过夜</button>
-    </nav>
   </div>
+
+  <nav class="dock" aria-label="操作">
+    <div class="dock-inner">
+      <button class="action" id="btnWater" type="button"><span class="emoji">💧</span>浇水</button>
+      <button class="action primary" id="btnHarvest" type="button"><span class="emoji">✿</span>收获</button>
+      <button class="action" id="btnRest" type="button"><span class="emoji">🌙</span>过夜</button>
+    </div>
+  </nav>
 
   <div class="toast" id="toast" role="status"></div>
 
   <script>
     const SEEDS = {
-      blush: { id: "blush", name: "胭脂芽", cost: 8 },
-      mint: { id: "mint", name: "薄荷铃", cost: 6 },
+      blush: {
+        id: "blush",
+        name: "胭脂芽",
+        icon: "🌸",
+        desc: "柔软粉瓣，清晨最香",
+        cost: 8,
+        bloomColor: "blush",
+      },
+      mint: {
+        id: "mint",
+        name: "薄荷铃",
+        icon: "🌿",
+        desc: "淡绿小花，带一点凉意",
+        cost: 6,
+        bloomColor: "mint",
+      },
     };
-
-    const stageLabel = ["嫩芽", "花苞", "盛开"];
 
     const state = {
       coins: 48,
@@ -213,8 +794,13 @@
       selectedSeed: "blush",
       selectedPlot: null,
       inventory: { blush: 3, mint: 2 },
-      plots: Array.from({ length: 9 }, (_, i) => ({ id: i, plant: null })),
+      plots: Array.from({ length: 9 }, (_, i) => ({
+        id: i,
+        plant: null,
+      })),
     };
+
+    const stageLabel = ["嫩芽", "花苞", "盛开"];
 
     const el = {
       plots: document.getElementById("plots"),
@@ -265,7 +851,16 @@
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "seed-btn" + (state.selectedSeed === seed.id ? " active" : "");
-        btn.textContent = `${seed.name} ×${count}`;
+        btn.innerHTML = `
+          <div class="seed-top">
+            <div class="seed-icon">${seed.icon}</div>
+            <div class="seed-meta">
+              <strong>${seed.name}</strong>
+              <small>${seed.desc}</small>
+            </div>
+            <div class="seed-count">×${count}</div>
+          </div>
+        `;
         btn.addEventListener("click", () => {
           state.selectedSeed = seed.id;
           el.hint.textContent = `已选「${seed.name}」——点空地即可播种`;
@@ -275,10 +870,20 @@
       });
     }
 
-    function plotLabel(plot) {
-      if (!plot.plant) return "空地";
-      const s = SEEDS[plot.plant.seedId];
-      return `${s.name}·${stageLabel[plot.plant.stage]}`;
+    function plantHTML(plant) {
+      if (!plant) return '<div class="empty-mark" aria-hidden="true"></div>';
+      if (plant.stage === 0) {
+        return `<div class="plant" aria-hidden="true"><div class="sprout"></div></div>`;
+      }
+      if (plant.stage === 1) {
+        return `<div class="plant" aria-hidden="true"><div class="bud"><div class="stem"></div><div class="head"></div></div></div>`;
+      }
+      const color = SEEDS[plant.seedId].bloomColor === "mint" ? "mint" : "";
+      return `<div class="plant" aria-hidden="true"><div class="bloom ${color}">
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div>
+        <div class="center"></div><div class="stem"></div>
+      </div></div>`;
     }
 
     function renderPlots() {
@@ -287,9 +892,23 @@
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "plot";
+        btn.setAttribute("role", "gridcell");
         if (state.selectedPlot === plot.id) btn.classList.add("selected");
         if (plot.plant?.wateredToday) btn.classList.add("wet");
-        btn.textContent = plotLabel(plot);
+
+        let label = "空地";
+        if (plot.plant) {
+          const s = SEEDS[plot.plant.seedId];
+          label = `${s.name}·${stageLabel[plot.plant.stage]}`;
+        }
+        btn.setAttribute("aria-label", `花圃 ${plot.id + 1}，${label}`);
+        btn.innerHTML = `
+          <div class="plot-inner">
+            <div class="dew"></div>
+            ${plantHTML(plot.plant)}
+            <span class="plot-label">${label}</span>
+          </div>
+        `;
         btn.addEventListener("click", () => onPlotClick(plot.id));
         el.plots.appendChild(btn);
       });
@@ -363,8 +982,14 @@
 
       plot.plant.wateredToday = true;
       log(`给「${SEEDS[plot.plant.seedId].name}」浇了一瓢清凉的水`);
-      toast("浇水完成");
+      toast("浇水完成 ✧");
       el.hint.textContent = "土变湿了。点「过夜」，花会悄悄长大";
+
+      const plotBtn = el.plots.children[state.selectedPlot];
+      if (plotBtn) {
+        plotBtn.classList.add("watering");
+        setTimeout(() => plotBtn.classList.remove("watering"), 850);
+      }
       renderPlots();
     });
 
@@ -386,7 +1011,7 @@
       state.coins += gain;
       state.inventory[seed.id] = (state.inventory[seed.id] || 0) + seedGain;
       log(`收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}`);
-      toast(`收获啦 · +${gain}`);
+      toast(`收获啦 · +${gain} ◎`);
       plot.plant = null;
       el.hint.textContent = "花圃空出来了，可以再种一颗";
       renderSeeds();
@@ -424,6 +1049,7 @@
     });
 
     state.plots[4].plant = { seedId: "blush", stage: 1, wateredToday: false };
+
     renderSeeds();
     renderPlots();
     log("小院已经准备好了，等你来照料");

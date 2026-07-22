@@ -1192,6 +1192,178 @@
     box-shadow: 0 4px 12px var(--shadow);
   }
   .travel-btn:active { transform: scale(0.98); }
+  .market-btn {
+    border: 1px solid var(--chip-border);
+    background: linear-gradient(160deg, rgba(232, 196, 168, 0.45), var(--surface));
+    color: var(--leaf-deep);
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+  .market-btn:active { transform: scale(0.98); }
+  .market-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .market-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--dock-h) + var(--safe-b) + 8px);
+    z-index: 26;
+    max-height: min(68dvh, 560px);
+    background: var(--sheet-bg);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -12px 40px rgba(60, 90, 70, 0.18);
+    padding:
+      10px
+      max(14px, env(safe-area-inset-right, 0px))
+      16px
+      max(14px, env(safe-area-inset-left, 0px));
+    transform: translateY(calc(100% + var(--dock-h) + var(--safe-b) + 24px));
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .market-sheet.open {
+    transform: translateY(0);
+    pointer-events: auto;
+    visibility: visible;
+  }
+  .market-sheet[hidden] {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  .market-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 2px;
+    background: var(--surface-soft);
+    border-radius: 14px;
+    border: 1px solid var(--border-soft);
+  }
+  .market-tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    padding: 10px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    min-height: 44px;
+  }
+  .market-tab.active {
+    background: var(--surface);
+    color: var(--leaf-deep);
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .market-body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 4px;
+  }
+  .market-note {
+    font-size: var(--fs-xs);
+    color: var(--ink-mute);
+    line-height: 1.45;
+    padding: 0 2px 4px;
+  }
+  .market-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 12px;
+    border-radius: 16px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border-soft);
+  }
+  .market-row .m-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--border-soft);
+  }
+  html.night .market-row .m-icon {
+    background: rgba(20, 28, 36, 0.45);
+  }
+  .market-row .m-meta strong {
+    display: block;
+    font-size: var(--fs-md);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .market-row .m-meta small {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--fs-xs);
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .market-row .m-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .market-row .m-price {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--gold-color, #b8860b);
+    white-space: nowrap;
+  }
+  .market-row .m-stock {
+    font-size: var(--fs-xs);
+    color: var(--ink-mute);
+  }
+  .market-row button.m-btn {
+    border: none;
+    background: var(--leaf);
+    color: #fff;
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    min-height: 40px;
+    min-width: 72px;
+  }
+  .market-row button.m-btn.sell {
+    background: linear-gradient(160deg, #d4a574, #c4895a);
+  }
+  .market-row button.m-btn.tea {
+    background: linear-gradient(160deg, #7eb8a0, #5a9a82);
+  }
+  .market-row button.m-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 
   /* —— map sheet —— */
   .sheet-mask {
@@ -1365,6 +1537,16 @@
       max-height: min(60vh, 520px);
     }
     .map-sheet.open { transform: translate(-50%, 0); }
+    .market-sheet {
+      left: 50%;
+      right: auto;
+      width: min(440px, 92vw);
+      border-radius: 22px;
+      bottom: calc(var(--dock-h) + var(--safe-b) + 16px);
+      max-height: min(64vh, 560px);
+      transform: translate(-50%, calc(100% + var(--dock-h) + var(--safe-b) + 24px));
+    }
+    .market-sheet.open { transform: translate(-50%, 0); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1428,6 +1610,7 @@
           </div>
           <div class="region-tools">
             <div class="weather" id="regionWeather">☁ 微风 · 适宜生长</div>
+            <button class="market-btn" id="btnMarket" type="button">🏪 市贸</button>
             <button class="travel-btn" id="btnTravel" type="button">🗺 出游</button>
           </div>
         </div>
@@ -1467,6 +1650,23 @@
       <button class="sheet-close" id="btnCloseMap" type="button" aria-label="关闭">×</button>
     </div>
     <div class="region-list" id="regionList"></div>
+  </div>
+
+  <div class="market-sheet" id="marketSheet" role="dialog" aria-modal="true" aria-labelledby="marketTitle" hidden>
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <div>
+        <h2 id="marketTitle">市贸广场</h2>
+        <p>旅人支起的小摊——买种子、卖花束，或喝杯茶回点体力。</p>
+      </div>
+      <button class="sheet-close" id="btnCloseMarket" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="market-tabs" role="tablist">
+      <button class="market-tab active" type="button" data-tab="buy" role="tab" aria-selected="true">买种</button>
+      <button class="market-tab" type="button" data-tab="sell" role="tab" aria-selected="false">卖花</button>
+      <button class="market-tab" type="button" data-tab="rest" role="tab" aria-selected="false">小憩</button>
+    </div>
+    <div class="market-body" id="marketBody"></div>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
@@ -1562,6 +1762,10 @@
       return Array.from({ length: n }, (_, i) => ({ id: i, plant: null }));
     }
 
+    const MARKET_UNLOCK_DAY = 2;
+    const TEA_COST = 15;
+    const TEA_ENERGY = 4;
+
     const state = {
       coins: 48,
       energy: 12,
@@ -1571,6 +1775,8 @@
       selectedSeed: "blush",
       selectedPlot: null,
       inventory: { blush: 3, mint: 2, mist: 1, river: 1 },
+      flowers: { blush: 0, mint: 0, mist: 0, river: 0 },
+      marketTab: "buy",
       regionPlots: {
         home: makePlots(9),
         mist: makePlots(6),
@@ -1606,6 +1812,10 @@
       btnCloseMap: document.getElementById("btnCloseMap"),
       sheetMask: document.getElementById("sheetMask"),
       mapSheet: document.getElementById("mapSheet"),
+      marketSheet: document.getElementById("marketSheet"),
+      marketBody: document.getElementById("marketBody"),
+      btnMarket: document.getElementById("btnMarket"),
+      btnCloseMarket: document.getElementById("btnCloseMarket"),
       regionList: document.getElementById("regionList"),
       regionTitle: document.getElementById("regionTitle"),
       regionWeather: document.getElementById("regionWeather"),
@@ -1677,23 +1887,211 @@
       return true;
     }
 
-    function openMap() {
-      renderRegionList();
+    function anySheetOpen() {
+      return el.mapSheet.classList.contains("open") || el.marketSheet.classList.contains("open");
+    }
+
+    function openSheet(sheetEl) {
+      closeMap(true);
+      closeMarket(true);
       el.sheetMask.hidden = false;
-      el.mapSheet.hidden = false;
+      sheetEl.hidden = false;
       requestAnimationFrame(() => {
         el.sheetMask.classList.add("open");
-        el.mapSheet.classList.add("open");
+        sheetEl.classList.add("open");
       });
     }
 
-    function closeMap() {
+    function closeSheet(sheetEl, instant) {
       el.sheetMask.classList.remove("open");
-      el.mapSheet.classList.remove("open");
-      setTimeout(() => {
-        el.sheetMask.hidden = true;
-        el.mapSheet.hidden = true;
-      }, 300);
+      sheetEl.classList.remove("open");
+      const hide = () => {
+        if (!anySheetOpen()) {
+          el.sheetMask.hidden = true;
+        }
+        sheetEl.hidden = true;
+      };
+      if (instant) hide();
+      else setTimeout(hide, 300);
+    }
+
+    function openMap() {
+      renderRegionList();
+      openSheet(el.mapSheet);
+    }
+
+    function closeMap(instant) {
+      if (!el.mapSheet.classList.contains("open") && el.mapSheet.hidden) return;
+      closeSheet(el.mapSheet, instant);
+    }
+
+    function isMarketUnlocked() {
+      return state.day >= MARKET_UNLOCK_DAY;
+    }
+
+    function openMarket() {
+      if (!isMarketUnlocked()) {
+        toast(`市贸广场第 ${MARKET_UNLOCK_DAY} 天开门，再等等`);
+        return;
+      }
+      renderMarket();
+      openSheet(el.marketSheet);
+    }
+
+    function closeMarket(instant) {
+      if (!el.marketSheet.classList.contains("open") && el.marketSheet.hidden) return;
+      closeSheet(el.marketSheet, instant);
+    }
+
+    function flowerSellPrice(seedId) {
+      const seed = SEEDS[seedId];
+      return seed.cost + 6;
+    }
+
+    function renderMarket() {
+      el.btnMarket.disabled = false;
+      // tabs
+      el.marketSheet.querySelectorAll(".market-tab").forEach((tab) => {
+        const on = tab.dataset.tab === state.marketTab;
+        tab.classList.toggle("active", on);
+        tab.setAttribute("aria-selected", on ? "true" : "false");
+      });
+
+      const body = el.marketBody;
+      body.innerHTML = "";
+
+      if (state.marketTab === "buy") {
+        const note = document.createElement("p");
+        note.className = "market-note";
+        note.textContent = "旅人从别处带来的种子，买回去就能种。外地种子也可先囤着。";
+        body.appendChild(note);
+        Object.values(SEEDS).forEach((seed) => {
+          const row = document.createElement("div");
+          row.className = "market-row";
+          const stock = state.inventory[seed.id] || 0;
+          const can = state.coins >= seed.cost;
+          row.innerHTML = `
+            <div class="m-icon">${seed.icon}</div>
+            <div class="m-meta">
+              <strong>${seed.name}</strong>
+              <small>${seed.desc} · 袋中 ×${stock}</small>
+            </div>
+            <div class="m-action">
+              <span class="m-price">◎ ${seed.cost}</span>
+              <button class="m-btn" type="button" data-buy="${seed.id}" ${can ? "" : "disabled"}>买 1</button>
+            </div>`;
+          body.appendChild(row);
+        });
+        body.querySelectorAll("[data-buy]").forEach((btn) => {
+          btn.addEventListener("click", () => buySeed(btn.dataset.buy));
+        });
+      } else if (state.marketTab === "sell") {
+        const note = document.createElement("p");
+        note.className = "market-note";
+        note.textContent = "把盛开收获的花束卖给路过的旅人，换回更多金币。";
+        body.appendChild(note);
+        let any = false;
+        Object.values(SEEDS).forEach((seed) => {
+          const count = state.flowers[seed.id] || 0;
+          if (count <= 0) return;
+          any = true;
+          const price = flowerSellPrice(seed.id);
+          const row = document.createElement("div");
+          row.className = "market-row";
+          row.innerHTML = `
+            <div class="m-icon">${seed.icon}</div>
+            <div class="m-meta">
+              <strong>${seed.name}花束</strong>
+              <small>刚从花圃摘下的 · 库存 ×${count}</small>
+            </div>
+            <div class="m-action">
+              <span class="m-price">◎ ${price}</span>
+              <button class="m-btn sell" type="button" data-sell="${seed.id}">卖 1</button>
+            </div>`;
+          body.appendChild(row);
+        });
+        if (!any) {
+          const empty = document.createElement("p");
+          empty.className = "market-note";
+          empty.textContent = "还没有花束。等花盛开后点「收获」，再回来卖。";
+          body.appendChild(empty);
+        }
+        body.querySelectorAll("[data-sell]").forEach((btn) => {
+          btn.addEventListener("click", () => sellFlower(btn.dataset.sell));
+        });
+      } else {
+        const note = document.createElement("p");
+        note.className = "market-note";
+        note.textContent = "广场角落的茶摊，喝一口能缓缓回点体力。";
+        body.appendChild(note);
+        const canTea = state.coins >= TEA_COST && state.energy < state.maxEnergy;
+        const row = document.createElement("div");
+        row.className = "market-row";
+        row.innerHTML = `
+          <div class="m-icon">🍵</div>
+          <div class="m-meta">
+            <strong>薄荷露珠茶</strong>
+            <small>体力 +${TEA_ENERGY}（不超过上限）· 当前 ${state.energy}/${state.maxEnergy}</small>
+          </div>
+          <div class="m-action">
+            <span class="m-price">◎ ${TEA_COST}</span>
+            <button class="m-btn tea" type="button" id="btnBuyTea" ${canTea ? "" : "disabled"}>喝一杯</button>
+          </div>`;
+        body.appendChild(row);
+        const teaBtn = body.querySelector("#btnBuyTea");
+        if (teaBtn) teaBtn.addEventListener("click", buyTea);
+      }
+    }
+
+    function buySeed(seedId) {
+      const seed = SEEDS[seedId];
+      if (!seed) return;
+      if (state.coins < seed.cost) {
+        toast("金币不够啦");
+        return;
+      }
+      state.coins -= seed.cost;
+      state.inventory[seedId] = (state.inventory[seedId] || 0) + 1;
+      log(`在市贸广场买下「${seed.name}」种子（◎ −${seed.cost}）`);
+      toast(`买到 ${seed.name} · −${seed.cost} ◎`);
+      updateHud();
+      renderSeeds();
+      renderMarket();
+    }
+
+    function sellFlower(seedId) {
+      const seed = SEEDS[seedId];
+      const count = state.flowers[seedId] || 0;
+      if (!seed || count <= 0) {
+        toast("没有这种花束了");
+        return;
+      }
+      const price = flowerSellPrice(seedId);
+      state.flowers[seedId] -= 1;
+      state.coins += price;
+      log(`把「${seed.name}」花束卖给旅人，◎ +${price}`);
+      toast(`卖出花束 · +${price} ◎`);
+      updateHud();
+      renderMarket();
+    }
+
+    function buyTea() {
+      if (state.energy >= state.maxEnergy) {
+        toast("体力已经满了");
+        return;
+      }
+      if (state.coins < TEA_COST) {
+        toast("金币不够买茶");
+        return;
+      }
+      state.coins -= TEA_COST;
+      const before = state.energy;
+      state.energy = Math.min(state.maxEnergy, state.energy + TEA_ENERGY);
+      const gained = state.energy - before;
+      log(`在市贸喝了薄荷露珠茶，体力 +${gained}（◎ −${TEA_COST}）`);
+      toast(`体力 +${gained} · 好舒服`);
+      updateHud();
+      renderMarket();
     }
 
     function renderRegionList() {
@@ -1876,7 +2274,7 @@
         }
         const count = state.inventory[seedId] || 0;
         if (count <= 0) {
-          toast("这种子用完了，收获后再来吧");
+          toast(isMarketUnlocked() ? "种子用完了，去市贸买一点吧" : "这种子用完了，收获后再来吧");
           renderPlots();
           return;
         }
@@ -1954,10 +2352,11 @@
       const seedGain = 1 + (Math.random() > 0.55 ? 1 : 0);
       state.coins += gain;
       state.inventory[seed.id] = (state.inventory[seed.id] || 0) + seedGain;
+      state.flowers[seed.id] = (state.flowers[seed.id] || 0) + 1;
       log(
-        `在「${region.name}」收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}`
+        `在「${region.name}」收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}，花束 +1`
       );
-      toast(`收获啦 · +${gain} ◎`);
+      toast(`收获啦 · +${gain} ◎ · 花束 +1`);
       plot.plant = null;
       el.hint.textContent = "花圃空出来了，可以再种一颗";
       renderSeeds();
@@ -1999,6 +2398,11 @@
           toast(`解锁 ${region.name}`);
         }
       });
+      if (state.day === MARKET_UNLOCK_DAY) {
+        log("市贸广场开张了——可以买种、卖花、喝杯茶");
+        toast("市贸广场开张");
+        el.btnMarket.disabled = false;
+      }
 
       let msg = grew
         ? `天亮了。各地共有 ${grew} 株植物又长高了一点`
@@ -2014,8 +2418,32 @@
 
     el.btnTravel.addEventListener("click", openMap);
     el.btnCloseMap.addEventListener("click", closeMap);
-    el.sheetMask.addEventListener("click", closeMap);
+    el.btnMarket.addEventListener("click", openMarket);
+    el.btnCloseMarket.addEventListener("click", closeMarket);
+    el.sheetMask.addEventListener("click", () => {
+      closeMap();
+      closeMarket();
+    });
+    el.marketSheet.querySelectorAll(".market-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        state.marketTab = tab.dataset.tab;
+        renderMarket();
+      });
+    });
     el.btnTheme.addEventListener("click", toggleTheme);
+
+    // 市贸未解锁时按钮可点但会 toast；视觉上第 1 天略淡
+    function refreshMarketBtn() {
+      el.btnMarket.style.opacity = isMarketUnlocked() ? "1" : "0.55";
+      el.btnMarket.title = isMarketUnlocked()
+        ? "市贸广场"
+        : `第 ${MARKET_UNLOCK_DAY} 天开张`;
+    }
+    const _renderAll = renderAll;
+    renderAll = function () {
+      _renderAll();
+      refreshMarketBtn();
+    };
 
     el.startBtn.addEventListener("click", () => {
       el.intro.classList.add("hide");
@@ -2024,7 +2452,7 @@
 
     applyTheme(isNight());
     renderAll();
-    log("小院已经准备好了。照料两天后，可以出游雾丘与河岸");
+    log("小院已经准备好了。照料两天后，市贸开张，也可出游雾丘与河岸");
   </script>
 </body>
 </html>

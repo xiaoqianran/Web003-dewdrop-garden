@@ -59,6 +59,7 @@
     color: #666;
   }
   .plot.selected { outline: 2px solid #4a90a4; }
+  .plot.wet { background: #d8d0c4; }
   .seed-list { display: flex; flex-direction: column; gap: 8px; }
   .seed-btn {
     border: 1px solid #ddd;
@@ -77,6 +78,12 @@
     overflow-y: auto;
   }
   .log-body p { margin-bottom: 6px; }
+  .log-body p em {
+    font-style: normal;
+    color: #999;
+    margin-right: 4px;
+    font-size: 0.75rem;
+  }
   .dock {
     display: flex;
     justify-content: center;
@@ -158,7 +165,7 @@
       <h1>露珠小院</h1>
       <div class="stats">
         <span>金币 <span id="coins">48</span></span>
-        <span>体力 <span id="energy">12</span>/16</span>
+        <span>体力 <span id="energy">12</span>/<span id="energyMax">16</span></span>
         <span>第 <span id="day">1</span> 天</span>
       </div>
     </header>
@@ -188,30 +195,238 @@
     </nav>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status"></div>
 
   <script>
-    // 结构占位：交互逻辑在后续提交中补齐
-    document.getElementById("startBtn").addEventListener("click", () => {
-      document.getElementById("intro").classList.add("hide");
-    });
-    const plots = document.getElementById("plots");
-    for (let i = 0; i < 9; i++) {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "plot";
-      b.textContent = "空地";
-      plots.appendChild(b);
+    const SEEDS = {
+      blush: { id: "blush", name: "胭脂芽", cost: 8 },
+      mint: { id: "mint", name: "薄荷铃", cost: 6 },
+    };
+
+    const stageLabel = ["嫩芽", "花苞", "盛开"];
+
+    const state = {
+      coins: 48,
+      energy: 12,
+      maxEnergy: 16,
+      day: 1,
+      selectedSeed: "blush",
+      selectedPlot: null,
+      inventory: { blush: 3, mint: 2 },
+      plots: Array.from({ length: 9 }, (_, i) => ({ id: i, plant: null })),
+    };
+
+    const el = {
+      plots: document.getElementById("plots"),
+      seedList: document.getElementById("seedList"),
+      log: document.getElementById("log"),
+      coins: document.getElementById("coins"),
+      energy: document.getElementById("energy"),
+      energyMax: document.getElementById("energyMax"),
+      day: document.getElementById("day"),
+      hint: document.getElementById("statusHint"),
+      toast: document.getElementById("toast"),
+      intro: document.getElementById("intro"),
+      startBtn: document.getElementById("startBtn"),
+      btnWater: document.getElementById("btnWater"),
+      btnHarvest: document.getElementById("btnHarvest"),
+      btnRest: document.getElementById("btnRest"),
+    };
+
+    let toastTimer = null;
+    function toast(msg) {
+      el.toast.textContent = msg;
+      el.toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.toast.classList.remove("show"), 1800);
     }
-    const seedList = document.getElementById("seedList");
-    ["胭脂芽 ×3", "薄荷铃 ×2"].forEach((name, i) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "seed-btn" + (i === 0 ? " active" : "");
-      b.textContent = name;
-      seedList.appendChild(b);
+
+    function log(msg) {
+      const p = document.createElement("p");
+      const t = new Date();
+      const stamp = `${String(t.getHours()).padStart(2, "0")}:${String(t.getMinutes()).padStart(2, "0")}`;
+      p.innerHTML = `<em>${stamp}</em>${msg}`;
+      el.log.prepend(p);
+    }
+
+    function spendEnergy(n) {
+      if (state.energy < n) {
+        toast("体力不太够了，歇息一夜再来吧");
+        return false;
+      }
+      state.energy -= n;
+      return true;
+    }
+
+    function renderSeeds() {
+      el.seedList.innerHTML = "";
+      Object.values(SEEDS).forEach((seed) => {
+        const count = state.inventory[seed.id] || 0;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "seed-btn" + (state.selectedSeed === seed.id ? " active" : "");
+        btn.textContent = `${seed.name} ×${count}`;
+        btn.addEventListener("click", () => {
+          state.selectedSeed = seed.id;
+          el.hint.textContent = `已选「${seed.name}」——点空地即可播种`;
+          renderSeeds();
+        });
+        el.seedList.appendChild(btn);
+      });
+    }
+
+    function plotLabel(plot) {
+      if (!plot.plant) return "空地";
+      const s = SEEDS[plot.plant.seedId];
+      return `${s.name}·${stageLabel[plot.plant.stage]}`;
+    }
+
+    function renderPlots() {
+      el.plots.innerHTML = "";
+      state.plots.forEach((plot) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "plot";
+        if (state.selectedPlot === plot.id) btn.classList.add("selected");
+        if (plot.plant?.wateredToday) btn.classList.add("wet");
+        btn.textContent = plotLabel(plot);
+        btn.addEventListener("click", () => onPlotClick(plot.id));
+        el.plots.appendChild(btn);
+      });
+      updateHud();
+    }
+
+    function updateHud() {
+      el.coins.textContent = state.coins;
+      el.energy.textContent = state.energy;
+      el.energyMax.textContent = state.maxEnergy;
+      el.day.textContent = state.day;
+      const sel = state.selectedPlot != null ? state.plots[state.selectedPlot] : null;
+      el.btnWater.disabled = !sel || !sel.plant || sel.plant.stage >= 2;
+      el.btnHarvest.disabled = !sel || !sel.plant || sel.plant.stage < 2;
+    }
+
+    function onPlotClick(id) {
+      const plot = state.plots[id];
+      state.selectedPlot = id;
+
+      if (!plot.plant) {
+        const seedId = state.selectedSeed;
+        const count = state.inventory[seedId] || 0;
+        if (count <= 0) {
+          toast("这种子用完了，收获后再来吧");
+          renderPlots();
+          return;
+        }
+        if (!spendEnergy(1)) {
+          renderPlots();
+          return;
+        }
+        state.inventory[seedId] -= 1;
+        plot.plant = { seedId, stage: 0, wateredToday: false };
+        log(`在第 ${id + 1} 块地播下了「${SEEDS[seedId].name}」`);
+        toast(`种下了 ${SEEDS[seedId].name}`);
+        el.hint.textContent = "选中植株后点「浇水」，让它慢慢长大";
+        renderSeeds();
+        renderPlots();
+        return;
+      }
+
+      el.hint.textContent =
+        plot.plant.stage >= 2
+          ? "这朵花已经盛开，可以收获了"
+          : plot.plant.wateredToday
+            ? "今天浇过水了，过夜后会继续生长"
+            : "点下方「浇水」，帮它喝一口露珠";
+      renderPlots();
+    }
+
+    el.btnWater.addEventListener("click", () => {
+      if (state.selectedPlot == null) {
+        toast("先点选一块有植株的地");
+        return;
+      }
+      const plot = state.plots[state.selectedPlot];
+      if (!plot.plant) {
+        toast("空地还不需要浇水");
+        return;
+      }
+      if (plot.plant.stage >= 2) {
+        toast("已经盛开啦，直接收获吧");
+        return;
+      }
+      if (plot.plant.wateredToday) {
+        toast("今天已经浇过了，明天再来");
+        return;
+      }
+      if (!spendEnergy(1)) return;
+
+      plot.plant.wateredToday = true;
+      log(`给「${SEEDS[plot.plant.seedId].name}」浇了一瓢清凉的水`);
+      toast("浇水完成");
+      el.hint.textContent = "土变湿了。点「过夜」，花会悄悄长大";
+      renderPlots();
     });
-    document.getElementById("log").innerHTML = "<p>小院结构已搭好，等待玩法接入</p>";
+
+    el.btnHarvest.addEventListener("click", () => {
+      if (state.selectedPlot == null) {
+        toast("先点选一朵盛开的花");
+        return;
+      }
+      const plot = state.plots[state.selectedPlot];
+      if (!plot.plant || plot.plant.stage < 2) {
+        toast("还没盛开，再等等");
+        return;
+      }
+      if (!spendEnergy(1)) return;
+
+      const seed = SEEDS[plot.plant.seedId];
+      const gain = seed.cost + 4;
+      const seedGain = 1 + (Math.random() > 0.55 ? 1 : 0);
+      state.coins += gain;
+      state.inventory[seed.id] = (state.inventory[seed.id] || 0) + seedGain;
+      log(`收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}`);
+      toast(`收获啦 · +${gain}`);
+      plot.plant = null;
+      el.hint.textContent = "花圃空出来了，可以再种一颗";
+      renderSeeds();
+      renderPlots();
+    });
+
+    el.btnRest.addEventListener("click", () => {
+      state.day += 1;
+      state.energy = state.maxEnergy;
+      let grew = 0;
+      state.plots.forEach((p) => {
+        if (p.plant && p.plant.wateredToday && p.plant.stage < 2) {
+          p.plant.stage += 1;
+          p.plant.wateredToday = false;
+          grew += 1;
+        } else if (p.plant) {
+          p.plant.wateredToday = false;
+        }
+      });
+      log(
+        grew
+          ? `天亮了。有 ${grew} 株植物又长高了一点`
+          : "天亮了。今天的花圃静悄悄的"
+      );
+      toast(`第 ${state.day} 天 · 体力已回满`);
+      el.hint.textContent = grew
+        ? "有花长大了，去看看吧"
+        : "新的一天，浇浇水或种种新种子";
+      renderPlots();
+    });
+
+    el.startBtn.addEventListener("click", () => {
+      el.intro.classList.add("hide");
+      log("推开院门，晨光落在南窗花圃上");
+    });
+
+    state.plots[4].plant = { seedId: "blush", stage: 1, wateredToday: false };
+    renderSeeds();
+    renderPlots();
+    log("小院已经准备好了，等你来照料");
   </script>
 </body>
 </html>

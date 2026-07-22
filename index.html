@@ -848,6 +848,213 @@
     .action { font-size: 0.88rem; padding: 12px 14px; }
   }
 
+
+  /* —— region themes —— */
+  .garden-panel.theme-home {
+    background: rgba(255, 253, 248, 0.6);
+  }
+  .garden-panel.theme-mist {
+    background: linear-gradient(180deg, rgba(220, 230, 240, 0.72), rgba(255, 253, 248, 0.55));
+  }
+  .garden-panel.theme-mist .garden-sky {
+    background: linear-gradient(180deg, #c5d8e8 0%, #e8eef4 55%, transparent 100%);
+  }
+  .garden-panel.theme-river {
+    background: linear-gradient(180deg, rgba(210, 236, 240, 0.55), rgba(255, 253, 248, 0.58));
+  }
+  .garden-panel.theme-river .garden-sky {
+    background: linear-gradient(180deg, #b8dde6 0%, #e5f4f6 55%, transparent 100%);
+  }
+  .garden-header .region-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .travel-btn {
+    border: 1px solid rgba(111,175,142,0.35);
+    background: rgba(255,253,248,0.92);
+    color: var(--leaf-deep);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+  .travel-btn:active { transform: scale(0.98); }
+
+  /* bloom colors for new seeds */
+  .bloom.mist .petal { background: linear-gradient(180deg, #eef3f8, #c5d0dc); }
+  .bloom.mist .center { background: #9aadc0; }
+  .bloom.river .petal { background: linear-gradient(180deg, #fff6c8, #f0d66a); }
+  .bloom.river .center { background: #e8a838; }
+
+  /* —— map sheet —— */
+  .sheet-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    background: rgba(50, 70, 60, 0.28);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .sheet-mask.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .map-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 26;
+    max-height: min(78dvh, 640px);
+    background: var(--paper);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -12px 40px rgba(60, 90, 70, 0.18);
+    padding:
+      10px
+      max(14px, env(safe-area-inset-right, 0px))
+      calc(16px + env(safe-area-inset-bottom, 0px))
+      max(14px, env(safe-area-inset-left, 0px));
+    transform: translateY(110%);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .map-sheet.open { transform: translateY(0); }
+  .sheet-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(120, 140, 130, 0.28);
+    margin: 2px auto 4px;
+  }
+  .sheet-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .sheet-head h2 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 400;
+  }
+  .sheet-head p {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .sheet-close {
+    border: none;
+    background: var(--mint-soft);
+    color: var(--leaf-deep);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .region-list {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 4px;
+  }
+  .region-card {
+    border: 1px solid rgba(111,175,142,0.22);
+    background: linear-gradient(135deg, rgba(255,253,248,0.98), rgba(228,244,235,0.45));
+    border-radius: 18px;
+    padding: 14px;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .region-card.theme-mist {
+    background: linear-gradient(135deg, #f4f7fb, #e2eaf2);
+    border-color: rgba(140, 165, 190, 0.35);
+  }
+  .region-card.theme-river {
+    background: linear-gradient(135deg, #f3fbfc, #dceff2);
+    border-color: rgba(100, 170, 185, 0.35);
+  }
+  .region-card.current {
+    box-shadow: 0 0 0 2px rgba(111,175,142,0.45);
+  }
+  .region-card.locked {
+    opacity: 0.62;
+    cursor: not-allowed;
+  }
+  .region-card .r-name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+  }
+  .region-card .r-desc {
+    grid-column: 1 / -1;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .region-card .r-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    grid-column: 1 / -1;
+  }
+  .region-card .tag {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.75);
+    color: var(--ink-soft);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .region-card .r-status {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--leaf-deep);
+    align-self: start;
+    white-space: nowrap;
+  }
+  .region-card.locked .r-status { color: var(--ink-mute); }
+
+  .dock-inner { max-width: 560px; }
+  .dock .action { flex: 1; min-width: 0; }
+  @media (min-width: 640px) {
+    .map-sheet {
+      left: 50%;
+      right: auto;
+      width: min(440px, 100%);
+      transform: translate(-50%, 110%);
+      border-radius: 22px;
+      bottom: calc(var(--dock-h) + var(--safe-b) + 16px);
+      max-height: min(70vh, 560px);
+    }
+    .map-sheet.open { transform: translate(-50%, 0); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -870,8 +1077,8 @@
       <div class="badge">小清新 · 休闲养成</div>
       <h2>露珠小院</h2>
       <p>
-        清晨的露水还挂在叶片上。选一颗种子，点一下空地种下，
-        再轻轻浇水——花朵会慢慢从嫩芽长成。收获后能换新种子。
+        清晨的露水还挂在叶片上。照料南窗花圃，攒几天后
+        就能推开院门出游——雾丘与河岸各有不同的花。
       </p>
       <button class="start" id="startBtn" type="button">推开院门</button>
     </div>
@@ -894,17 +1101,20 @@
     </header>
 
     <main class="stage">
-      <section class="garden-panel" aria-label="花园">
+      <section class="garden-panel theme-home" id="gardenPanel" aria-label="花园">
         <div class="garden-sky" aria-hidden="true">
           <div class="cloud c1"></div>
           <div class="cloud c2"></div>
         </div>
         <div class="garden-header">
           <div>
-            <h2>南窗花圃</h2>
+            <h2 id="regionTitle">南窗花圃</h2>
             <p class="hint" id="statusHint">先从下方选一颗种子，再点空地播种</p>
           </div>
-          <div class="weather">☁ 微风 · 适宜生长</div>
+          <div class="region-tools">
+            <div class="weather" id="regionWeather">☁ 微风 · 适宜生长</div>
+            <button class="travel-btn" id="btnTravel" type="button">🗺 出游</button>
+          </div>
         </div>
         <div class="plots" id="plots" role="grid" aria-label="九块花圃"></div>
       </section>
@@ -930,6 +1140,20 @@
     </div>
   </nav>
 
+
+  <div class="sheet-mask" id="sheetMask" hidden></div>
+  <div class="map-sheet" id="mapSheet" role="dialog" aria-modal="true" aria-labelledby="mapTitle" hidden>
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <div>
+        <h2 id="mapTitle">出游地图</h2>
+        <p>离开小院去别处种种看。过夜时，各地花圃都会悄悄长大。</p>
+      </div>
+      <button class="sheet-close" id="btnCloseMap" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="region-list" id="regionList"></div>
+  </div>
+
   <div class="toast" id="toast" role="status"></div>
 
   <script>
@@ -950,20 +1174,89 @@
         cost: 6,
         bloomColor: "mint",
       },
+      mist: {
+        id: "mist",
+        name: "雾铃草",
+        icon: "🤍",
+        desc: "半透明铃花，喜薄雾",
+        cost: 10,
+        bloomColor: "mist",
+      },
+      river: {
+        id: "river",
+        name: "水仙芽",
+        icon: "🌼",
+        desc: "淡黄花瓣，爱湿润砂土",
+        cost: 12,
+        bloomColor: "river",
+      },
     };
+
+    const REGIONS = {
+      home: {
+        id: "home",
+        name: "南窗花圃",
+        desc: "小院里最熟悉的那块地，适合胭脂芽与薄荷铃。",
+        weather: "☁ 微风 · 适宜生长",
+        theme: "home",
+        unlockDay: 1,
+        travelCost: 0,
+        plotCount: 9,
+        seedIds: ["blush", "mint"],
+        harvestBonus: 0,
+      },
+      mist: {
+        id: "mist",
+        name: "雾丘浅坡",
+        desc: "山腰常年挂着轻雾，雾铃草在这里长得最稳。",
+        weather: "🌫 薄雾 · 生长缓慢而扎实",
+        theme: "mist",
+        unlockDay: 2,
+        travelCost: 2,
+        plotCount: 6,
+        seedIds: ["mist"],
+        harvestBonus: 2,
+      },
+      river: {
+        id: "river",
+        name: "浅滩河岸",
+        desc: "河水带来的砂土，水仙芽一夜之间就更精神。",
+        weather: "💧 湿润 · 一夜长得更快",
+        theme: "river",
+        unlockDay: 3,
+        travelCost: 2,
+        plotCount: 6,
+        seedIds: ["river"],
+        harvestBonus: 3,
+        doubleGrowthChance: 0.35,
+      },
+    };
+
+    function makePlots(n) {
+      return Array.from({ length: n }, (_, i) => ({ id: i, plant: null }));
+    }
 
     const state = {
       coins: 48,
       energy: 12,
       maxEnergy: 16,
       day: 1,
+      regionId: "home",
       selectedSeed: "blush",
       selectedPlot: null,
-      inventory: { blush: 3, mint: 2 },
-      plots: Array.from({ length: 9 }, (_, i) => ({
-        id: i,
-        plant: null,
-      })),
+      inventory: { blush: 3, mint: 2, mist: 1, river: 1 },
+      regionPlots: {
+        home: makePlots(9),
+        mist: makePlots(6),
+        river: makePlots(6),
+      },
+    };
+
+    // starter plant in home center
+    state.regionPlots.home[4].plant = {
+      seedId: "blush",
+      stage: 1,
+      wateredToday: false,
     };
 
     const stageLabel = ["嫩芽", "花苞", "盛开"];
@@ -983,7 +1276,27 @@
       btnWater: document.getElementById("btnWater"),
       btnHarvest: document.getElementById("btnHarvest"),
       btnRest: document.getElementById("btnRest"),
+      btnTravel: document.getElementById("btnTravel"),
+      btnCloseMap: document.getElementById("btnCloseMap"),
+      sheetMask: document.getElementById("sheetMask"),
+      mapSheet: document.getElementById("mapSheet"),
+      regionList: document.getElementById("regionList"),
+      regionTitle: document.getElementById("regionTitle"),
+      regionWeather: document.getElementById("regionWeather"),
+      gardenPanel: document.getElementById("gardenPanel"),
     };
+
+    function currentRegion() {
+      return REGIONS[state.regionId];
+    }
+
+    function currentPlots() {
+      return state.regionPlots[state.regionId];
+    }
+
+    function isUnlocked(region) {
+      return state.day >= region.unlockDay;
+    }
 
     let toastTimer = null;
     function toast(msg) {
@@ -1010,9 +1323,104 @@
       return true;
     }
 
+    function openMap() {
+      renderRegionList();
+      el.sheetMask.hidden = false;
+      el.mapSheet.hidden = false;
+      requestAnimationFrame(() => {
+        el.sheetMask.classList.add("open");
+        el.mapSheet.classList.add("open");
+      });
+    }
+
+    function closeMap() {
+      el.sheetMask.classList.remove("open");
+      el.mapSheet.classList.remove("open");
+      setTimeout(() => {
+        el.sheetMask.hidden = true;
+        el.mapSheet.hidden = true;
+      }, 300);
+    }
+
+    function renderRegionList() {
+      el.regionList.innerHTML = "";
+      Object.values(REGIONS).forEach((region) => {
+        const unlocked = isUnlocked(region);
+        const here = state.regionId === region.id;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className =
+          "region-card theme-" +
+          region.theme +
+          (here ? " current" : "") +
+          (!unlocked ? " locked" : "");
+
+        let status = "前往";
+        if (!unlocked) status = `第 ${region.unlockDay} 天解锁`;
+        else if (here) status = "当前";
+        else if (region.travelCost > 0) status = `体力 −${region.travelCost}`;
+        else status = "回家";
+
+        const seedNames = region.seedIds.map((id) => SEEDS[id].name).join("、");
+        btn.innerHTML = `
+          <div class="r-name">${region.name}</div>
+          <div class="r-status">${status}</div>
+          <div class="r-desc">${region.desc}</div>
+          <div class="r-meta">
+            <span class="tag">${region.weather}</span>
+            <span class="tag">${region.plotCount} 格</span>
+            <span class="tag">作物 · ${seedNames}</span>
+          </div>
+        `;
+        btn.addEventListener("click", () => travelTo(region.id));
+        el.regionList.appendChild(btn);
+      });
+    }
+
+    function travelTo(regionId) {
+      const region = REGIONS[regionId];
+      if (!region) return;
+      if (state.regionId === regionId) {
+        toast("已经在这里啦");
+        closeMap();
+        return;
+      }
+      if (!isUnlocked(region)) {
+        toast(`再过几天吧——第 ${region.unlockDay} 天才能去`);
+        return;
+      }
+      if (region.travelCost > 0 && !spendEnergy(region.travelCost)) return;
+
+      state.regionId = regionId;
+      state.selectedPlot = null;
+      // pick first available seed for this region if current not plantable
+      if (!region.seedIds.includes(state.selectedSeed)) {
+        state.selectedSeed = region.seedIds[0];
+      }
+      log(
+        region.id === "home"
+          ? "推开院门，回到了南窗花圃"
+          : `步行前往「${region.name}」${region.travelCost ? `（体力 −${region.travelCost}）` : ""}`
+      );
+      toast(region.id === "home" ? "回到小院" : `抵达 ${region.name}`);
+      el.hint.textContent = `这里适合种：${region.seedIds.map((id) => SEEDS[id].name).join("、")}`;
+      closeMap();
+      renderAll();
+    }
+
+    function renderRegionChrome() {
+      const region = currentRegion();
+      el.regionTitle.textContent = region.name;
+      el.regionWeather.textContent = region.weather;
+      el.gardenPanel.className = "garden-panel theme-" + region.theme;
+      el.plots.setAttribute("aria-label", region.name + "花圃");
+    }
+
     function renderSeeds() {
       el.seedList.innerHTML = "";
-      Object.values(SEEDS).forEach((seed) => {
+      const region = currentRegion();
+      region.seedIds.forEach((seedId) => {
+        const seed = SEEDS[seedId];
         const count = state.inventory[seed.id] || 0;
         const btn = document.createElement("button");
         btn.type = "button";
@@ -1044,8 +1452,10 @@
       if (plant.stage === 1) {
         return `<div class="plant" aria-hidden="true"><div class="bud"><div class="stem"></div><div class="head"></div></div></div>`;
       }
-      const color = SEEDS[plant.seedId].bloomColor === "mint" ? "mint" : "";
-      return `<div class="plant" aria-hidden="true"><div class="bloom ${color}">
+      const color = SEEDS[plant.seedId].bloomColor;
+      const colorClass =
+        color === "mint" ? "mint" : color === "mist" ? "mist" : color === "river" ? "river" : "";
+      return `<div class="plant" aria-hidden="true"><div class="bloom ${colorClass}">
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
         <div class="petal"></div><div class="petal"></div>
         <div class="center"></div><div class="stem"></div>
@@ -1054,7 +1464,8 @@
 
     function renderPlots() {
       el.plots.innerHTML = "";
-      state.plots.forEach((plot) => {
+      const plots = currentPlots();
+      plots.forEach((plot) => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "plot";
@@ -1086,17 +1497,31 @@
       el.energy.textContent = state.energy;
       el.energyMax.textContent = state.maxEnergy;
       el.day.textContent = state.day;
-      const sel = state.selectedPlot != null ? state.plots[state.selectedPlot] : null;
+      const plots = currentPlots();
+      const sel = state.selectedPlot != null ? plots[state.selectedPlot] : null;
       el.btnWater.disabled = !sel || !sel.plant || sel.plant.stage >= 2;
       el.btnHarvest.disabled = !sel || !sel.plant || sel.plant.stage < 2;
     }
 
+    function renderAll() {
+      renderRegionChrome();
+      renderSeeds();
+      renderPlots();
+    }
+
     function onPlotClick(id) {
-      const plot = state.plots[id];
+      const plots = currentPlots();
+      const plot = plots[id];
+      const region = currentRegion();
       state.selectedPlot = id;
 
       if (!plot.plant) {
         const seedId = state.selectedSeed;
+        if (!region.seedIds.includes(seedId)) {
+          toast("这种子不适合这里，换一颗吧");
+          renderPlots();
+          return;
+        }
         const count = state.inventory[seedId] || 0;
         if (count <= 0) {
           toast("这种子用完了，收获后再来吧");
@@ -1109,7 +1534,7 @@
         }
         state.inventory[seedId] -= 1;
         plot.plant = { seedId, stage: 0, wateredToday: false };
-        log(`在第 ${id + 1} 块地播下了「${SEEDS[seedId].name}」`);
+        log(`在「${region.name}」第 ${id + 1} 块地播下了「${SEEDS[seedId].name}」`);
         toast(`种下了 ${SEEDS[seedId].name}`);
         el.hint.textContent = "选中植株后点「浇水」，让它慢慢长大";
         renderSeeds();
@@ -1131,7 +1556,7 @@
         toast("先点选一块有植株的地");
         return;
       }
-      const plot = state.plots[state.selectedPlot];
+      const plot = currentPlots()[state.selectedPlot];
       if (!plot.plant) {
         toast("空地还不需要浇水");
         return;
@@ -1164,7 +1589,8 @@
         toast("先点选一朵盛开的花");
         return;
       }
-      const plot = state.plots[state.selectedPlot];
+      const plot = currentPlots()[state.selectedPlot];
+      const region = currentRegion();
       if (!plot.plant || plot.plant.stage < 2) {
         toast("还没盛开，再等等");
         return;
@@ -1172,11 +1598,13 @@
       if (!spendEnergy(1)) return;
 
       const seed = SEEDS[plot.plant.seedId];
-      const gain = seed.cost + 4;
+      const gain = seed.cost + 4 + (region.harvestBonus || 0);
       const seedGain = 1 + (Math.random() > 0.55 ? 1 : 0);
       state.coins += gain;
       state.inventory[seed.id] = (state.inventory[seed.id] || 0) + seedGain;
-      log(`收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}`);
+      log(
+        `在「${region.name}」收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}`
+      );
       toast(`收获啦 · +${gain} ◎`);
       plot.plant = null;
       el.hint.textContent = "花圃空出来了，可以再种一颗";
@@ -1188,37 +1616,61 @@
       state.day += 1;
       state.energy = state.maxEnergy;
       let grew = 0;
-      state.plots.forEach((p) => {
-        if (p.plant && p.plant.wateredToday && p.plant.stage < 2) {
-          p.plant.stage += 1;
-          p.plant.wateredToday = false;
-          grew += 1;
-        } else if (p.plant) {
-          p.plant.wateredToday = false;
+      let bonusGrew = 0;
+
+      Object.values(REGIONS).forEach((region) => {
+        const plots = state.regionPlots[region.id];
+        plots.forEach((p) => {
+          if (p.plant && p.plant.wateredToday && p.plant.stage < 2) {
+            p.plant.stage += 1;
+            p.plant.wateredToday = false;
+            grew += 1;
+            // 河岸：有概率多长一阶（仍不超过盛开）
+            if (
+              region.doubleGrowthChance &&
+              p.plant.stage < 2 &&
+              Math.random() < region.doubleGrowthChance
+            ) {
+              p.plant.stage += 1;
+              bonusGrew += 1;
+            }
+          } else if (p.plant) {
+            p.plant.wateredToday = false;
+          }
+        });
+      });
+
+      // unlock notices
+      Object.values(REGIONS).forEach((region) => {
+        if (region.unlockDay === state.day) {
+          log(`地图更新：可以出游去「${region.name}」了`);
+          toast(`解锁 ${region.name}`);
         }
       });
-      log(
-        grew
-          ? `天亮了。有 ${grew} 株植物又长高了一点`
-          : "天亮了。今天的花圃静悄悄的"
-      );
+
+      let msg = grew
+        ? `天亮了。各地共有 ${grew} 株植物又长高了一点`
+        : "天亮了。今天的花圃静悄悄的";
+      if (bonusGrew) msg += `（河岸额外抽芽 ${bonusGrew} 次）`;
+      log(msg);
       toast(`第 ${state.day} 天 · 体力已回满`);
       el.hint.textContent = grew
-        ? "有花长大了，去看看吧"
-        : "新的一天，浇浇水或种种新种子";
-      renderPlots();
+        ? "有花长大了——别忘了别处的花圃"
+        : "新的一天，浇浇水，或点「出游」去看看";
+      renderAll();
     });
+
+    el.btnTravel.addEventListener("click", openMap);
+    el.btnCloseMap.addEventListener("click", closeMap);
+    el.sheetMask.addEventListener("click", closeMap);
 
     el.startBtn.addEventListener("click", () => {
       el.intro.classList.add("hide");
       log("推开院门，晨光落在南窗花圃上");
     });
 
-    state.plots[4].plant = { seedId: "blush", stage: 1, wateredToday: false };
-
-    renderSeeds();
-    renderPlots();
-    log("小院已经准备好了，等你来照料");
+    renderAll();
+    log("小院已经准备好了。照料两天后，可以出游雾丘与河岸");
   </script>
 </body>
 </html>

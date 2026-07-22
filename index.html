@@ -1229,6 +1229,25 @@
     cursor: not-allowed;
     transform: none;
   }
+  .codex-btn {
+    border: 1px solid var(--chip-border);
+    background: linear-gradient(160deg, rgba(180, 200, 230, 0.4), var(--surface));
+    color: var(--leaf-deep);
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+  .codex-btn:active { transform: scale(0.98); }
+
 
   .market-sheet {
     position: fixed;
@@ -1378,6 +1397,169 @@
     opacity: 0.4;
     cursor: not-allowed;
   }
+
+  .codex-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--dock-h) + var(--safe-b) + 8px);
+    z-index: 26;
+    max-height: min(72dvh, 600px);
+    background: var(--sheet-bg);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -12px 40px rgba(60, 90, 70, 0.18);
+    padding:
+      10px
+      max(14px, env(safe-area-inset-right, 0px))
+      16px
+      max(14px, env(safe-area-inset-left, 0px));
+    transform: translateY(calc(100% + var(--dock-h) + var(--safe-b) + 24px));
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .codex-sheet.open {
+    transform: translateY(0);
+    pointer-events: auto;
+    visibility: visible;
+  }
+  .codex-sheet[hidden] {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  .codex-progress {
+    font-size: var(--fs-sm);
+    color: var(--ink-soft);
+    padding: 0 2px;
+  }
+  .codex-progress strong {
+    color: var(--leaf-deep);
+    font-weight: 600;
+  }
+  .codex-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .codex-card {
+    border-radius: 16px;
+    padding: 12px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+  }
+  .codex-card.locked {
+    opacity: 0.72;
+  }
+  .codex-card .c-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .codex-card .c-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1.2rem;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--border-soft);
+  }
+  html.night .codex-card .c-icon {
+    background: rgba(20, 28, 36, 0.45);
+  }
+  .codex-card .c-name {
+    font-size: var(--fs-md);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .codex-card .c-sub {
+    font-size: var(--fs-xs);
+    color: var(--ink-mute);
+  }
+  .codex-card .c-stages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .codex-card .stage-chip {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border-soft);
+    color: var(--ink-mute);
+    background: transparent;
+  }
+  .codex-card .stage-chip.on {
+    color: var(--leaf-deep);
+    background: var(--chip-bg);
+    border-color: var(--chip-border);
+  }
+  .codex-card .c-count {
+    font-size: var(--fs-xs);
+    color: var(--ink-soft);
+  }
+  .achieve-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .achieve-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 16px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border-soft);
+  }
+  .achieve-row.locked {
+    opacity: 0.55;
+  }
+  .achieve-row .a-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--border-soft);
+  }
+  html.night .achieve-row .a-icon {
+    background: rgba(20, 28, 36, 0.45);
+  }
+  .achieve-row .a-meta strong {
+    display: block;
+    font-size: var(--fs-sm);
+    color: var(--ink);
+  }
+  .achieve-row .a-meta small {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--fs-xs);
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .achieve-row .a-badge {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--leaf-deep);
+    white-space: nowrap;
+  }
+  .achieve-row.locked .a-badge {
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+
 
   /* —— map sheet —— */
   .sheet-mask {
@@ -1561,6 +1743,16 @@
       transform: translate(-50%, calc(100% + var(--dock-h) + var(--safe-b) + 24px));
     }
     .market-sheet.open { transform: translate(-50%, 0); }
+    .codex-sheet {
+      left: 50%;
+      right: auto;
+      width: min(440px, 92vw);
+      border-radius: 22px;
+      bottom: calc(var(--dock-h) + var(--safe-b) + 16px);
+      max-height: min(70vh, 600px);
+      transform: translate(-50%, calc(100% + var(--dock-h) + var(--safe-b) + 24px));
+    }
+    .codex-sheet.open { transform: translate(-50%, 0); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1626,6 +1818,7 @@
           </div>
           <div class="region-tools">
             <div class="weather" id="regionWeather">☁ 微风 · 适宜生长</div>
+            <button class="codex-btn" id="btnCodex" type="button">📔 图鉴</button>
             <button class="market-btn" id="btnMarket" type="button">🏪 市贸</button>
             <button class="travel-btn" id="btnTravel" type="button">🗺 出游</button>
           </div>
@@ -1683,6 +1876,22 @@
       <button class="market-tab" type="button" data-tab="rest" role="tab" aria-selected="false">小憩</button>
     </div>
     <div class="market-body" id="marketBody"></div>
+  </div>
+
+  <div class="codex-sheet" id="codexSheet" role="dialog" aria-modal="true" aria-labelledby="codexTitle" hidden>
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <div>
+        <h2 id="codexTitle">小院图鉴</h2>
+        <p>记下见过的花与悄悄达成的小事。</p>
+      </div>
+      <button class="sheet-close" id="btnCloseCodex" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="market-tabs" role="tablist">
+      <button class="market-tab active" type="button" data-codex-tab="plants" role="tab" aria-selected="true">花草</button>
+      <button class="market-tab" type="button" data-codex-tab="achieve" role="tab" aria-selected="false">成就</button>
+    </div>
+    <div class="market-body" id="codexBody"></div>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
@@ -1783,7 +1992,31 @@
     const TEA_ENERGY = 4;
 
     const SAVE_KEY = "dewdrop-save-v1";
-    const SAVE_VERSION = 1;
+    const SAVE_VERSION = 2;
+
+    function emptyCodexEntry() {
+      return { seen: [false, false, false], harvests: 0, planted: false };
+    }
+
+    function defaultCodex() {
+      return {
+        blush: emptyCodexEntry(),
+        mint: emptyCodexEntry(),
+        mist: emptyCodexEntry(),
+        river: emptyCodexEntry(),
+      };
+    }
+
+    const ACHIEVEMENTS = [
+      { id: "first_plant", icon: "🌱", name: "第一颗种子", desc: "在花圃里播下第一颗种子" },
+      { id: "first_harvest", icon: "✿", name: "第一束花", desc: "收获第一朵盛开的花" },
+      { id: "first_travel", icon: "🗺", name: "推开院门", desc: "第一次出游到外地花圃" },
+      { id: "first_market", icon: "🏪", name: "市贸常客", desc: "在市贸广场完成一笔买卖或喝茶" },
+      { id: "day5", icon: "☀", name: "五日小院", desc: "照料小院到第 5 天" },
+      { id: "coins100", icon: "◎", name: "小有积蓄", desc: "手里攒到 100 金币" },
+      { id: "all_harvest", icon: "🌸", name: "四时花开", desc: "四种花都至少收获过一次" },
+      { id: "full_codex", icon: "📔", name: "花谱写满", desc: "见过全部四种花的三个生长阶段" },
+    ];
 
     function defaultState() {
       const s = {
@@ -1797,6 +2030,9 @@
         inventory: { blush: 3, mint: 2, mist: 1, river: 1 },
         flowers: { blush: 0, mint: 0, mist: 0, river: 0 },
         marketTab: "buy",
+        codexTab: "plants",
+        codex: defaultCodex(),
+        achievements: {},
         regionPlots: {
           home: makePlots(9),
           mist: makePlots(6),
@@ -1809,6 +2045,8 @@
         stage: 1,
         wateredToday: false,
       };
+      // 开局已见过胭脂芽花苞
+      s.codex.blush.seen[1] = true;
       return s;
     }
 
@@ -1825,6 +2063,8 @@
         selectedSeed: state.selectedSeed,
         inventory: { ...state.inventory },
         flowers: { ...state.flowers },
+        codex: state.codex,
+        achievements: { ...state.achievements },
         regionPlots: Object.fromEntries(
           Object.entries(state.regionPlots).map(([rid, plots]) => [
             rid,
@@ -1864,7 +2104,7 @@
         const raw = localStorage.getItem(SAVE_KEY);
         if (!raw) return false;
         const data = JSON.parse(raw);
-        if (!data || data.v !== SAVE_VERSION) return false;
+        if (!data || (data.v !== 1 && data.v !== 2 && data.v !== SAVE_VERSION)) return false;
 
         state.coins = Math.max(0, Number(data.coins) || 0);
         state.energy = Math.max(0, Number(data.energy) || 0);
@@ -1891,6 +2131,26 @@
           });
         }
 
+        state.codex = defaultCodex();
+        if (data.codex && typeof data.codex === "object") {
+          Object.keys(state.codex).forEach((k) => {
+            const src = data.codex[k];
+            if (!src) return;
+            state.codex[k].planted = !!src.planted;
+            state.codex[k].harvests = Math.max(0, Number(src.harvests) || 0);
+            if (Array.isArray(src.seen)) {
+              state.codex[k].seen = [0, 1, 2].map((i) => !!src.seen[i]);
+            }
+          });
+        }
+        state.achievements = {};
+        if (data.achievements && typeof data.achievements === "object") {
+          Object.keys(data.achievements).forEach((id) => {
+            if (data.achievements[id]) state.achievements[id] = true;
+          });
+        }
+        state.codexTab = "plants";
+
         Object.keys(REGIONS).forEach((rid) => {
           const count = REGIONS[rid].plotCount;
           const saved = data.regionPlots && data.regionPlots[rid];
@@ -1916,6 +2176,28 @@
         if (region && !region.seedIds.includes(state.selectedSeed)) {
           state.selectedSeed = region.seedIds[0];
         }
+
+        // 从现有花圃补全图鉴可见阶段（兼容 v1 存档）
+        Object.values(state.regionPlots).forEach((plots) => {
+          plots.forEach((p) => {
+            if (p.plant && state.codex[p.plant.seedId]) {
+              state.codex[p.plant.seedId].seen[p.plant.stage] = true;
+              state.codex[p.plant.seedId].planted = true;
+            }
+          });
+        });
+        // 从收获计数反推
+        Object.keys(state.flowers).forEach((id) => {
+          if ((state.flowers[id] || 0) > 0 && state.codex[id]) {
+            state.codex[id].seen[2] = true;
+            if (state.codex[id].harvests < state.flowers[id]) {
+              state.codex[id].harvests = Math.max(
+                state.codex[id].harvests,
+                state.flowers[id]
+              );
+            }
+          }
+        });
         return true;
       } catch (_) {
         return false;
@@ -1968,6 +2250,10 @@
       marketBody: document.getElementById("marketBody"),
       btnMarket: document.getElementById("btnMarket"),
       btnCloseMarket: document.getElementById("btnCloseMarket"),
+      codexSheet: document.getElementById("codexSheet"),
+      codexBody: document.getElementById("codexBody"),
+      btnCodex: document.getElementById("btnCodex"),
+      btnCloseCodex: document.getElementById("btnCloseCodex"),
       regionList: document.getElementById("regionList"),
       regionTitle: document.getElementById("regionTitle"),
       regionWeather: document.getElementById("regionWeather"),
@@ -2040,12 +2326,17 @@
     }
 
     function anySheetOpen() {
-      return el.mapSheet.classList.contains("open") || el.marketSheet.classList.contains("open");
+      return (
+        el.mapSheet.classList.contains("open") ||
+        el.marketSheet.classList.contains("open") ||
+        el.codexSheet.classList.contains("open")
+      );
     }
 
     function openSheet(sheetEl) {
       closeMap(true);
       closeMarket(true);
+      closeCodex(true);
       el.sheetMask.hidden = false;
       sheetEl.hidden = false;
       requestAnimationFrame(() => {
@@ -2093,6 +2384,127 @@
     function closeMarket(instant) {
       if (!el.marketSheet.classList.contains("open") && el.marketSheet.hidden) return;
       closeSheet(el.marketSheet, instant);
+    }
+
+    function openCodex() {
+      renderCodex();
+      openSheet(el.codexSheet);
+    }
+
+    function closeCodex(instant) {
+      if (!el.codexSheet.classList.contains("open") && el.codexSheet.hidden) return;
+      closeSheet(el.codexSheet, instant);
+    }
+
+    function notePlantSeen(seedId, stage) {
+      const entry = state.codex[seedId];
+      if (!entry) return;
+      if (stage >= 0 && stage <= 2) entry.seen[stage] = true;
+    }
+
+    function unlockAchievement(id) {
+      if (state.achievements[id]) return false;
+      const def = ACHIEVEMENTS.find((a) => a.id === id);
+      if (!def) return false;
+      state.achievements[id] = true;
+      log(`成就点亮：「${def.name}」`);
+      toast(`成就 · ${def.name}`);
+      return true;
+    }
+
+    function checkAchievements() {
+      if (state.day >= 5) unlockAchievement("day5");
+      if (state.coins >= 100) unlockAchievement("coins100");
+      const allHarvest = Object.keys(SEEDS).every(
+        (id) => (state.codex[id]?.harvests || 0) > 0
+      );
+      if (allHarvest) unlockAchievement("all_harvest");
+      const full = Object.keys(SEEDS).every((id) => {
+        const s = state.codex[id]?.seen || [];
+        return s[0] && s[1] && s[2];
+      });
+      if (full) unlockAchievement("full_codex");
+    }
+
+    function codexStats() {
+      let stages = 0;
+      let known = 0;
+      Object.keys(SEEDS).forEach((id) => {
+        const s = state.codex[id]?.seen || [];
+        const n = s.filter(Boolean).length;
+        stages += n;
+        if (n > 0) known += 1;
+      });
+      return { stages, known, totalStages: 12, totalPlants: 4 };
+    }
+
+    function renderCodex() {
+      el.codexSheet.querySelectorAll("[data-codex-tab]").forEach((tab) => {
+        const on = tab.dataset.codexTab === state.codexTab;
+        tab.classList.toggle("active", on);
+        tab.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      const body = el.codexBody;
+      body.innerHTML = "";
+
+      if (state.codexTab === "plants") {
+        const st = codexStats();
+        const prog = document.createElement("p");
+        prog.className = "codex-progress";
+        prog.innerHTML = `已遇见 <strong>${st.known}</strong> / ${st.totalPlants} 种花 · 阶段 <strong>${st.stages}</strong> / ${st.totalStages}`;
+        body.appendChild(prog);
+
+        const grid = document.createElement("div");
+        grid.className = "codex-grid";
+        Object.values(SEEDS).forEach((seed) => {
+          const entry = state.codex[seed.id] || emptyCodexEntry();
+          const any = entry.seen.some(Boolean);
+          const card = document.createElement("div");
+          card.className = "codex-card" + (any ? "" : " locked");
+          const stagesHtml = stageLabel
+            .map(
+              (label, i) =>
+                `<span class="stage-chip${entry.seen[i] ? " on" : ""}">${
+                  entry.seen[i] ? label : "？？"
+                }</span>`
+            )
+            .join("");
+          card.innerHTML = `
+            <div class="c-head">
+              <div class="c-icon">${any ? seed.icon : "❔"}</div>
+              <div>
+                <div class="c-name">${any ? seed.name : "未记载"}</div>
+                <div class="c-sub">${any ? seed.desc : "种下或遇见后才会写进图鉴"}</div>
+              </div>
+            </div>
+            <div class="c-stages">${stagesHtml}</div>
+            <div class="c-count">收获 ${entry.harvests} 次</div>`;
+          grid.appendChild(card);
+        });
+        body.appendChild(grid);
+      } else {
+        const unlocked = ACHIEVEMENTS.filter((a) => state.achievements[a.id]).length;
+        const prog = document.createElement("p");
+        prog.className = "codex-progress";
+        prog.innerHTML = `已点亮 <strong>${unlocked}</strong> / ${ACHIEVEMENTS.length}`;
+        body.appendChild(prog);
+        const list = document.createElement("div");
+        list.className = "achieve-list";
+        ACHIEVEMENTS.forEach((a) => {
+          const on = !!state.achievements[a.id];
+          const row = document.createElement("div");
+          row.className = "achieve-row" + (on ? "" : " locked");
+          row.innerHTML = `
+            <div class="a-icon">${on ? a.icon : "🔒"}</div>
+            <div class="a-meta">
+              <strong>${a.name}</strong>
+              <small>${a.desc}</small>
+            </div>
+            <div class="a-badge">${on ? "已点亮" : "未达成"}</div>`;
+          list.appendChild(row);
+        });
+        body.appendChild(list);
+      }
     }
 
     function flowerSellPrice(seedId) {
@@ -2204,6 +2616,8 @@
       }
       state.coins -= seed.cost;
       state.inventory[seedId] = (state.inventory[seedId] || 0) + 1;
+      unlockAchievement("first_market");
+      checkAchievements();
       log(`在市贸广场买下「${seed.name}」种子（◎ −${seed.cost}）`);
       toast(`买到 ${seed.name} · −${seed.cost} ◎`);
       updateHud();
@@ -2221,6 +2635,8 @@
       const price = flowerSellPrice(seedId);
       state.flowers[seedId] -= 1;
       state.coins += price;
+      unlockAchievement("first_market");
+      checkAchievements();
       log(`把「${seed.name}」花束卖给旅人，◎ +${price}`);
       toast(`卖出花束 · +${price} ◎`);
       updateHud();
@@ -2240,6 +2656,8 @@
       const before = state.energy;
       state.energy = Math.min(state.maxEnergy, state.energy + TEA_ENERGY);
       const gained = state.energy - before;
+      unlockAchievement("first_market");
+      checkAchievements();
       log(`在市贸喝了薄荷露珠茶，体力 +${gained}（◎ −${TEA_COST}）`);
       toast(`体力 +${gained} · 好舒服`);
       updateHud();
@@ -2300,6 +2718,9 @@
       // pick first available seed for this region if current not plantable
       if (!region.seedIds.includes(state.selectedSeed)) {
         state.selectedSeed = region.seedIds[0];
+      }
+      if (regionId !== "home") {
+        unlockAchievement("first_travel");
       }
       log(
         region.id === "home"
@@ -2437,6 +2858,10 @@
         }
         state.inventory[seedId] -= 1;
         plot.plant = { seedId, stage: 0, wateredToday: false };
+        state.codex[seedId].planted = true;
+        notePlantSeen(seedId, 0);
+        unlockAchievement("first_plant");
+        checkAchievements();
         log(`在「${region.name}」第 ${id + 1} 块地播下了「${SEEDS[seedId].name}」`);
         toast(`种下了 ${SEEDS[seedId].name}`);
         el.hint.textContent = "选中植株后点「浇水」，让它慢慢长大";
@@ -2445,6 +2870,7 @@
         return;
       }
 
+      notePlantSeen(plot.plant.seedId, plot.plant.stage);
       el.hint.textContent =
         plot.plant.stage >= 2
           ? "这朵花已经盛开，可以收获了"
@@ -2506,6 +2932,10 @@
       state.coins += gain;
       state.inventory[seed.id] = (state.inventory[seed.id] || 0) + seedGain;
       state.flowers[seed.id] = (state.flowers[seed.id] || 0) + 1;
+      state.codex[seed.id].harvests += 1;
+      notePlantSeen(seed.id, 2);
+      unlockAchievement("first_harvest");
+      checkAchievements();
       log(
         `在「${region.name}」收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}，花束 +1`
       );
@@ -2529,6 +2959,7 @@
             p.plant.stage += 1;
             p.plant.wateredToday = false;
             grew += 1;
+            notePlantSeen(p.plant.seedId, p.plant.stage);
             // 河岸：有概率多长一阶（仍不超过盛开）
             if (
               region.doubleGrowthChance &&
@@ -2537,9 +2968,11 @@
             ) {
               p.plant.stage += 1;
               bonusGrew += 1;
+              notePlantSeen(p.plant.seedId, p.plant.stage);
             }
           } else if (p.plant) {
             p.plant.wateredToday = false;
+            notePlantSeen(p.plant.seedId, p.plant.stage);
           }
         });
       });
@@ -2556,6 +2989,7 @@
         toast("市贸广场开张");
         el.btnMarket.disabled = false;
       }
+      checkAchievements();
 
       let msg = grew
         ? `天亮了。各地共有 ${grew} 株植物又长高了一点`
@@ -2573,14 +3007,23 @@
     el.btnCloseMap.addEventListener("click", closeMap);
     el.btnMarket.addEventListener("click", openMarket);
     el.btnCloseMarket.addEventListener("click", closeMarket);
+    el.btnCodex.addEventListener("click", openCodex);
+    el.btnCloseCodex.addEventListener("click", closeCodex);
     el.sheetMask.addEventListener("click", () => {
       closeMap();
       closeMarket();
+      closeCodex();
     });
     el.marketSheet.querySelectorAll(".market-tab").forEach((tab) => {
       tab.addEventListener("click", () => {
         state.marketTab = tab.dataset.tab;
         renderMarket();
+      });
+    });
+    el.codexSheet.querySelectorAll("[data-codex-tab]").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        state.codexTab = tab.dataset.codexTab;
+        renderCodex();
       });
     });
     el.btnTheme.addEventListener("click", toggleTheme);
@@ -2644,6 +3087,7 @@
 
     applyTheme(isNight());
     prepareIntro();
+    checkAchievements();
     renderAll();
     if (loaded) {
       log("读档成功——小院还记得你上次离开时的样子");

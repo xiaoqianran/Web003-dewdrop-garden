@@ -13,6 +13,8 @@ GitHub Pages：https://xiaoqianran.github.io/Web003-dewdrop-garden/
 播种 → 浇水 → 过夜成长 → 收获。  
 过夜时，**所有地区**的花圃都会一起生长。
 
+右上角 🌙 可切换**黑夜模式**（雾蓝夜空 + 薄荷月光），偏好会记在本机 `localStorage`。
+
 ### 出游地区
 
 | 地区 | 解锁 | 特色 |

@@ -1541,6 +1541,49 @@
     color: #a8c4d8;
   }
 
+  .decor-rail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 12px 8px;
+    position: relative;
+    z-index: 2;
+  }
+  .decor-rail[hidden] {
+    display: none !important;
+  }
+  .decor-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--border-soft);
+    font-size: var(--fs-xs);
+    color: var(--ink-soft);
+    box-shadow: 0 2px 8px var(--shadow);
+    backdrop-filter: blur(4px);
+  }
+  html.night .decor-chip {
+    background: rgba(20, 28, 36, 0.5);
+    color: var(--ink-soft);
+  }
+  .decor-chip .d-icon {
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+  .market-row button.m-btn.decor {
+    background: linear-gradient(160deg, #c4a8d4, #9a7ab0);
+  }
+  .market-row button.m-btn.decor-owned {
+    background: rgba(120, 140, 130, 0.35);
+    color: var(--ink-soft);
+  }
+  .market-row.decor-owned {
+    opacity: 0.78;
+  }
+
   .codex-sheet {
     position: fixed;
     left: 0;
@@ -1970,6 +2013,7 @@
             <button class="travel-btn" id="btnTravel" type="button">🗺 出游</button>
           </div>
         </div>
+        <div class="decor-rail" id="decorRail" hidden aria-label="小院装点"></div>
         <div class="plots" id="plots" role="grid" aria-label="九块花圃"></div>
       </section>
 
@@ -2013,7 +2057,7 @@
     <div class="sheet-head">
       <div>
         <h2 id="marketTitle">市贸广场</h2>
-        <p>旅人支起的小摊——买种、卖花、接委托，或喝杯茶回点体力。</p>
+        <p>旅人支起的小摊——买种、卖花、接委托、装点小院，或喝杯茶回点体力。</p>
       </div>
       <button class="sheet-close" id="btnCloseMarket" type="button" aria-label="关闭">×</button>
     </div>
@@ -2021,6 +2065,7 @@
       <button class="market-tab active" type="button" data-tab="buy" role="tab" aria-selected="true">买种</button>
       <button class="market-tab" type="button" data-tab="sell" role="tab" aria-selected="false">卖花</button>
       <button class="market-tab" type="button" data-tab="quest" role="tab" aria-selected="false">委托</button>
+      <button class="market-tab" type="button" data-tab="decor" role="tab" aria-selected="false">装点</button>
       <button class="market-tab" type="button" data-tab="rest" role="tab" aria-selected="false">小憩</button>
     </div>
     <div class="market-body" id="marketBody"></div>
@@ -2228,9 +2273,48 @@
     const TEA_COST = 15;
     const TEA_ENERGY = 4;
     const QUEST_COUNT = 3;
+    const DECOR_UNLOCK_DAY = 3;
 
     const SAVE_KEY = "dewdrop-save-v1";
-    const SAVE_VERSION = 4;
+    const SAVE_VERSION = 5;
+
+    const DECORS = {
+      lantern: {
+        id: "lantern",
+        name: "纸灯笼",
+        icon: "🏮",
+        cost: 28,
+        desc: "南窗廊下的暖黄小灯",
+      },
+      windchime: {
+        id: "windchime",
+        name: "风铃串",
+        icon: "🎐",
+        cost: 32,
+        desc: "微风一过就叮咚作响",
+      },
+      bench: {
+        id: "bench",
+        name: "青石小凳",
+        icon: "🪑",
+        cost: 40,
+        desc: "歇脚看花刚刚好",
+      },
+      birdbath: {
+        id: "birdbath",
+        name: "雀浴盆",
+        icon: "🪺",
+        cost: 36,
+        desc: "浅水映着云影",
+      },
+      banner: {
+        id: "banner",
+        name: "竹编幌子",
+        icon: "🎏",
+        cost: 45,
+        desc: "院门旁的一抹青绿",
+      },
+    };
 
     function emptyCodexEntry() {
       return { seen: [false, false, false], harvests: 0, planted: false };
@@ -2324,6 +2408,8 @@
       { id: "bamboo_path", icon: "🎋", name: "竹径访客", desc: "第一次抵达竹径闲亭" },
       { id: "first_quest", icon: "📜", name: "一纸委托", desc: "完成第一份市贸花束委托" },
       { id: "quest_five", icon: "🎀", name: "热心园丁", desc: "累计完成 5 份委托" },
+      { id: "first_decor", icon: "🎐", name: "院落初装", desc: "买下第一件小院装点" },
+      { id: "decor_three", icon: "🏡", name: "小院有致", desc: "收集三件不同的装点" },
     ];
 
     function defaultState() {
@@ -2346,6 +2432,7 @@
         quests: [],
         questDay: 0,
         questsDone: 0,
+        decors: {},
         regionPlots: {
           home: makePlots(9),
           mist: makePlots(6),
@@ -2395,6 +2482,7 @@
         })),
         questDay: state.questDay || state.day,
         questsDone: state.questsDone || 0,
+        decors: { ...(state.decors || {}) },
         regionPlots: Object.fromEntries(
           Object.entries(state.regionPlots).map(([rid, plots]) => [
             rid,
@@ -2434,7 +2522,7 @@
         const raw = localStorage.getItem(SAVE_KEY);
         if (!raw) return false;
         const data = JSON.parse(raw);
-        if (!data || ![1, 2, 3, 4, SAVE_VERSION].includes(data.v)) return false;
+        if (!data || ![1, 2, 3, 4, 5, SAVE_VERSION].includes(data.v)) return false;
 
         state.coins = Math.max(0, Number(data.coins) || 0);
         state.energy = Math.max(0, Number(data.energy) || 0);
@@ -2521,6 +2609,13 @@
           state.questDay = state.day;
         }
 
+        state.decors = {};
+        if (data.decors && typeof data.decors === "object") {
+          Object.keys(DECORS).forEach((id) => {
+            if (data.decors[id]) state.decors[id] = true;
+          });
+        }
+
         Object.keys(REGIONS).forEach((rid) => {
           const count = REGIONS[rid].plotCount;
           const saved = data.regionPlots && data.regionPlots[rid];
@@ -2596,6 +2691,7 @@
       state.quests = fresh.quests;
       state.questDay = fresh.questDay;
       state.questsDone = fresh.questsDone;
+      state.decors = fresh.decors;
       saveGame();
     }
 
@@ -2634,6 +2730,7 @@
       regionTitle: document.getElementById("regionTitle"),
       regionWeather: document.getElementById("regionWeather"),
       gardenPanel: document.getElementById("gardenPanel"),
+      decorRail: document.getElementById("decorRail"),
       btnTheme: document.getElementById("btnTheme"),
     };
 
@@ -2807,6 +2904,9 @@
       if (seenN >= 4) unlockAchievement("weather_four");
       if ((state.questsDone || 0) >= 1) unlockAchievement("first_quest");
       if ((state.questsDone || 0) >= 5) unlockAchievement("quest_five");
+      const decorN = Object.keys(state.decors || {}).filter((k) => state.decors[k]).length;
+      if (decorN >= 1) unlockAchievement("first_decor");
+      if (decorN >= 3) unlockAchievement("decor_three");
     }
 
     function codexStats() {
@@ -3009,6 +3109,39 @@
         body.querySelectorAll("[data-quest]").forEach((btn) => {
           btn.addEventListener("click", () => fulfillQuest(btn.dataset.quest));
         });
+      } else if (state.marketTab === "decor") {
+        const unlocked = state.day >= DECOR_UNLOCK_DAY;
+        const note = document.createElement("p");
+        note.className = "market-note";
+        note.textContent = unlocked
+          ? "货郎带来的小物件，买下后会摆在南窗花圃边。纯装饰，看着开心就好。"
+          : `装点小摊第 ${DECOR_UNLOCK_DAY} 天开张，再攒两天金币来逛。`;
+        body.appendChild(note);
+
+        Object.values(DECORS).forEach((item) => {
+          const owned = !!(state.decors && state.decors[item.id]);
+          const can = unlocked && !owned && state.coins >= item.cost;
+          const row = document.createElement("div");
+          row.className = "market-row" + (owned ? " decor-owned" : "");
+          row.innerHTML = `
+            <div class="m-icon">${item.icon}</div>
+            <div class="m-meta">
+              <strong>${item.name}</strong>
+              <small>${item.desc}${owned ? " · 已摆进小院" : ""}</small>
+            </div>
+            <div class="m-action">
+              <span class="m-price">${owned ? "已拥有" : `◎ ${item.cost}`}</span>
+              <button class="m-btn decor${owned ? " decor-owned" : ""}" type="button"
+                data-decor="${item.id}" ${can ? "" : "disabled"}>
+                ${owned ? "在院中" : unlocked ? "买下" : "未开张"}
+              </button>
+            </div>`;
+          body.appendChild(row);
+        });
+
+        body.querySelectorAll("[data-decor]").forEach((btn) => {
+          btn.addEventListener("click", () => buyDecor(btn.dataset.decor));
+        });
       } else {
         const note = document.createElement("p");
         note.className = "market-note";
@@ -3031,6 +3164,55 @@
         const teaBtn = body.querySelector("#btnBuyTea");
         if (teaBtn) teaBtn.addEventListener("click", buyTea);
       }
+    }
+
+    function buyDecor(decorId) {
+      const item = DECORS[decorId];
+      if (!item) return;
+      if (state.day < DECOR_UNLOCK_DAY) {
+        toast(`装点小摊第 ${DECOR_UNLOCK_DAY} 天开张`);
+        return;
+      }
+      if (state.decors && state.decors[decorId]) {
+        toast("这件已经摆在小院了");
+        return;
+      }
+      if (state.coins < item.cost) {
+        toast("金币不够买装点");
+        return;
+      }
+      state.coins -= item.cost;
+      if (!state.decors) state.decors = {};
+      state.decors[decorId] = true;
+      unlockAchievement("first_decor");
+      unlockAchievement("first_market");
+      checkAchievements();
+      log(`买下「${item.name}」装点小院（◎ −${item.cost}）`);
+      toast(`${item.icon} ${item.name} · 已摆好`);
+      updateHud();
+      renderDecors();
+      renderMarket();
+    }
+
+    function renderDecors() {
+      if (!el.decorRail) return;
+      const owned = Object.values(DECORS).filter(
+        (d) => state.decors && state.decors[d.id]
+      );
+      // 仅在南窗花圃显示装点
+      const atHome = state.regionId === "home";
+      if (!atHome || !owned.length) {
+        el.decorRail.hidden = true;
+        el.decorRail.innerHTML = "";
+        return;
+      }
+      el.decorRail.hidden = false;
+      el.decorRail.innerHTML = owned
+        .map(
+          (d) =>
+            `<span class="decor-chip" title="${d.desc}"><span class="d-icon">${d.icon}</span>${d.name}</span>`
+        )
+        .join("");
     }
 
     function fulfillQuest(questId) {
@@ -3209,6 +3391,7 @@
       el.gardenPanel.className =
         "garden-panel theme-" + region.theme + " wx-" + wx.id;
       el.plots.setAttribute("aria-label", region.name + "花圃");
+      renderDecors();
     }
 
     function renderSeeds() {
@@ -3507,6 +3690,10 @@
         log("市贸广场开张了——可以买种、卖花、接委托、喝杯茶");
         toast("市贸广场开张");
         el.btnMarket.disabled = false;
+      }
+      if (state.day === DECOR_UNLOCK_DAY) {
+        log("市贸来了装点货郎——可以给小院添点小物件");
+        toast("装点小摊开张");
       }
 
       // 每日委托刷新

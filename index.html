@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>露珠小院 · Dewdrop Courtyard</title>
+<link rel="icon" type="image/png" href="assets/logo.png" />
+<link rel="apple-touch-icon" href="assets/logo.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -363,26 +365,27 @@
     min-width: 0;
   }
   .logo {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    object-fit: contain;
+    padding: 5px;
     background:
-      radial-gradient(circle at 35% 30%, #fff 0 18%, transparent 19%),
-      radial-gradient(circle at 50% 55%, var(--ctp-teal) 0 42%, var(--ctp-green) 43% 70%, color-mix(in srgb, var(--ctp-green) 70%, black) 71%);
-    box-shadow: inset 0 -4px 8px color-mix(in srgb, black 10%, transparent), 0 4px 10px color-mix(in srgb, var(--ctp-green) 35%, transparent);
-    position: relative;
+      radial-gradient(circle at 35% 30%, color-mix(in srgb, white 80%, transparent), transparent 55%),
+      color-mix(in srgb, var(--ctp-teal) 14%, var(--ctp-base));
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--ctp-teal) 22%, transparent),
+      0 4px 12px color-mix(in srgb, var(--ctp-teal) 24%, transparent);
     flex-shrink: 0;
+    display: block;
   }
-  .logo::after {
-    content: "";
-    position: absolute;
-    width: 8px;
-    height: 10px;
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    background: rgba(255,255,255,0.85);
-    right: 7px;
-    top: 7px;
-    transform: rotate(18deg);
+  html.night .logo {
+    background:
+      radial-gradient(circle at 35% 30%, color-mix(in srgb, white 14%, transparent), transparent 55%),
+      color-mix(in srgb, var(--ctp-teal) 20%, var(--ctp-surface0));
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--ctp-teal) 30%, transparent),
+      0 4px 14px color-mix(in srgb, black 35%, transparent);
   }
   .brand h1 {
     font-family: var(--font-display);
@@ -393,9 +396,13 @@
   }
   .brand p {
     display: none;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--ink-soft);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  @media (min-width: 480px) {
+    .brand p { display: block; }
   }
   .stats {
     display: flex;
@@ -668,6 +675,23 @@
     align-items: center;
     filter: drop-shadow(0 2px 3px rgba(60, 80, 50, 0.18));
     transition: transform 0.35s cubic-bezier(.2,.8,.2,1);
+    transform-origin: 50% 100%;
+    animation: plant-sway 3.6s ease-in-out infinite;
+  }
+  .plant.stage-0 { animation-duration: 2.8s; }
+  .plant.stage-1 { animation-duration: 3.2s; }
+  .plant.stage-2 { animation-duration: 4.2s; }
+  @keyframes plant-sway {
+    0%, 100% { transform: translateX(-50%) rotate(-1.8deg); }
+    50% { transform: translateX(-50%) rotate(1.8deg); }
+  }
+  /* 盛开弹入：与软 UI 同系，不用位图 */
+  .plant.stage-2 .bloom {
+    animation: bloom-pop 0.42s cubic-bezier(.2,.9,.3,1) both;
+  }
+  @keyframes bloom-pop {
+    from { transform: scale(0.78); opacity: 0.35; }
+    to { transform: scale(1); opacity: 1; }
   }
 
   /* —— 嫩芽：按品种染色 —— */
@@ -766,28 +790,32 @@
     box-shadow: 0 2px 6px rgba(180, 140, 40, 0.22);
   }
 
-  /* —— 盛开：更立体的花瓣 —— */
-  .bloom { width: 44px; height: 46px; position: relative; }
+  /* —— 盛开：软粘土 UI 风（与库存图标同语言） —— */
+  .bloom { width: 46px; height: 48px; position: relative; }
   .bloom .stem {
     position: absolute;
     left: 50%;
     bottom: 0;
     width: 5px;
-    height: 16px;
-    background: linear-gradient(180deg, #8fd0a6, #4d8a6a);
-    border-radius: 3px;
+    height: 15px;
+    background: linear-gradient(180deg, #a6e3a1, #40a02b);
+    border-radius: 999px;
     transform: translateX(-50%);
     z-index: 0;
+    box-shadow: inset -1px 0 0 rgba(255,255,255,0.25);
   }
   .bloom .petal {
     position: absolute;
-    width: 15px;
+    width: 16px;
     height: 20px;
-    border-radius: 50% 50% 48% 48% / 62% 62% 38% 38%;
+    border-radius: 50% 50% 48% 48% / 60% 60% 40% 40%;
     left: 50%;
-    top: 2px;
-    transform-origin: center 18px;
-    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.08);
+    top: 1px;
+    transform-origin: center 19px;
+    /* 无描边，仅软阴影，贴近 Catppuccin 软图标 */
+    box-shadow:
+      inset 0 2px 4px rgba(255,255,255,0.45),
+      inset 0 -2px 4px rgba(0,0,0,0.06);
   }
   .bloom .petal:nth-child(1) { transform: translateX(-50%) rotate(0deg); }
   .bloom .petal:nth-child(2) { transform: translateX(-50%) rotate(72deg); }
@@ -798,95 +826,151 @@
     position: absolute;
     left: 50%;
     top: 12px;
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     transform: translateX(-50%);
     z-index: 2;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    box-shadow:
+      inset 0 1px 2px rgba(255,255,255,0.5),
+      0 1px 2px rgba(0,0,0,0.1);
   }
 
-  /* 胭脂芽 · 粉瓣 */
+  /* 胭脂芽 · Catppuccin flamingo / rosewater */
   .bloom.blush .petal:nth-child(1),
   .bloom.blush .petal:nth-child(3),
   .bloom.blush .petal:nth-child(5) {
-    background: linear-gradient(180deg, #ffe0dc, #f0a8a0);
+    background: linear-gradient(180deg, #f5e0dc, #f2cdcd 45%, #e8a0a0);
   }
   .bloom.blush .petal:nth-child(2),
   .bloom.blush .petal:nth-child(4) {
-    background: linear-gradient(180deg, #f8c8c2, #e88880);
+    background: linear-gradient(180deg, #f2cdcd, #dd7878);
   }
   .bloom.blush .center {
-    background: radial-gradient(circle at 35% 35%, #ffe9a8, #e8b060);
+    background: radial-gradient(circle at 35% 35%, #f9e2af, #df8e1d);
   }
 
-  /* 薄荷铃 · 淡绿 */
+  /* 薄荷铃 · Catppuccin green / teal */
   .bloom.mint .petal:nth-child(1),
   .bloom.mint .petal:nth-child(3),
   .bloom.mint .petal:nth-child(5) {
-    background: linear-gradient(180deg, #d8f4e4, #8fd4b0);
+    background: linear-gradient(180deg, #d8f5e8, #a6e3a1 50%, #7dcea0);
   }
   .bloom.mint .petal:nth-child(2),
   .bloom.mint .petal:nth-child(4) {
-    background: linear-gradient(180deg, #b8e8cc, #6fc49a);
+    background: linear-gradient(180deg, #94e2d5, #40a02b);
   }
   .bloom.mint .center {
-    background: radial-gradient(circle at 35% 35%, #fff6c8, #c8d878);
+    background: radial-gradient(circle at 35% 35%, #f9e2af, #a6d189);
   }
 
-  /* 雾铃草 · 灰白 */
+  /* 雾铃草 · lavender / overlay */
   .bloom.mist .petal:nth-child(1),
   .bloom.mist .petal:nth-child(3),
   .bloom.mist .petal:nth-child(5) {
-    background: linear-gradient(180deg, #f8fafc, #c8d4e0);
+    background: linear-gradient(180deg, #f5f5ff, #cdd6f4 50%, #b4befe);
   }
   .bloom.mist .petal:nth-child(2),
   .bloom.mist .petal:nth-child(4) {
-    background: linear-gradient(180deg, #e8eef4, #a8b8c8);
+    background: linear-gradient(180deg, #e6e9ef, #a6adc8);
   }
   .bloom.mist .center {
-    background: radial-gradient(circle at 35% 35%, #d8e0e8, #8a9cac);
+    background: radial-gradient(circle at 35% 35%, #bac2de, #7f849c);
   }
 
-  /* 水仙芽 · 淡黄 */
+  /* 水仙芽 · yellow / peach */
   .bloom.river .petal:nth-child(1),
   .bloom.river .petal:nth-child(3),
   .bloom.river .petal:nth-child(5) {
-    background: linear-gradient(180deg, #fff8d8, #f0d868);
+    background: linear-gradient(180deg, #fff8e0, #f9e2af 50%, #e8c868);
   }
   .bloom.river .petal:nth-child(2),
   .bloom.river .petal:nth-child(4) {
-    background: linear-gradient(180deg, #ffe89a, #e8c040);
+    background: linear-gradient(180deg, #f9e2af, #df8e1d);
   }
   .bloom.river .center {
-    background: radial-gradient(circle at 35% 35%, #fff0a0, #e89830);
+    background: radial-gradient(circle at 35% 35%, #fab387, #fe640b);
   }
 
   /* 竹影兰 · 青紫 */
   .sprout.bamboo {
     background: linear-gradient(180deg, #9ec9a8, #4d7a5c);
+    height: 20px;
   }
   .sprout.bamboo::before, .sprout.bamboo::after {
     background: linear-gradient(135deg, #c8b8e0, #8a78b0);
+    width: 11px;
+    height: 14px;
+    border-radius: 60% 10% 50% 40%;
   }
   .bud.bamboo .head {
+    width: 13px;
+    height: 22px;
+    border-radius: 55% 55% 40% 40% / 70% 70% 30% 30%;
     background:
-      radial-gradient(circle at 35% 28%, rgba(255,255,255,0.55), transparent 42%),
-      radial-gradient(circle at 50% 55%, #d4c4f0, #8a70c0);
+      radial-gradient(circle at 35% 22%, rgba(255,255,255,0.55), transparent 42%),
+      linear-gradient(180deg, #e0d0f4, #8a70c0 70%, #6a58a0);
     box-shadow: 0 2px 6px rgba(100, 80, 160, 0.22);
+  }
+  /* 薄荷铃 · 花苞略垂 */
+  .bud.mint .head {
+    border-radius: 45% 45% 55% 55% / 40% 40% 60% 60%;
+    width: 14px;
+    height: 16px;
+    top: 2px;
+  }
+  /* 雾铃草 · 半透明花苞 */
+  .bud.mist .head {
+    opacity: 0.92;
+    box-shadow:
+      0 2px 6px rgba(100, 120, 140, 0.16),
+      inset 0 0 0 1px rgba(255,255,255,0.45);
+  }
+  /* 水仙芽 · 花苞更圆胖 */
+  .bud.river .head {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
   }
   .bloom.bamboo .petal:nth-child(1),
   .bloom.bamboo .petal:nth-child(3),
   .bloom.bamboo .petal:nth-child(5) {
-    background: linear-gradient(180deg, #f0e8ff, #c0a8e8);
+    background: linear-gradient(180deg, #f0e8ff, #cba6f7 55%, #b4befe);
   }
   .bloom.bamboo .petal:nth-child(2),
   .bloom.bamboo .petal:nth-child(4) {
-    background: linear-gradient(180deg, #dcc8f4, #9878d0);
+    background: linear-gradient(180deg, #dcc8f4, #8839ef);
   }
   .bloom.bamboo .center {
-    background: radial-gradient(circle at 35% 35%, #e8f8d8, #88b868);
+    background: radial-gradient(circle at 35% 35%, #f9e2af, #a6e3a1);
   }
+  /* 薄荷铃 / 雾铃草盛开：铃状簇（与图标一致，仍是 CSS UI） */
+  .bloom.mint.bells,
+  .bloom.mist.bells {
+    width: 40px;
+    height: 46px;
+  }
+  .bloom.mint.bells .petal,
+  .bloom.mist.bells .petal {
+    width: 12px;
+    height: 14px;
+    border-radius: 40% 40% 55% 55% / 35% 35% 65% 65%;
+    top: auto;
+    bottom: 14px;
+    transform-origin: center top;
+  }
+  .bloom.mint.bells .petal:nth-child(1) { left: 28%; transform: rotate(-18deg); }
+  .bloom.mint.bells .petal:nth-child(2) { left: 50%; transform: translateX(-50%) rotate(0deg); bottom: 12px; width: 13px; height: 15px; }
+  .bloom.mint.bells .petal:nth-child(3) { left: auto; right: 22%; transform: rotate(18deg); }
+  .bloom.mint.bells .petal:nth-child(4) { left: 38%; transform: rotate(-8deg); bottom: 20px; opacity: 0.9; }
+  .bloom.mint.bells .petal:nth-child(5) { left: auto; right: 30%; transform: rotate(10deg); bottom: 20px; opacity: 0.9; }
+  .bloom.mist.bells .petal:nth-child(1) { left: 28%; transform: rotate(-18deg); }
+  .bloom.mist.bells .petal:nth-child(2) { left: 50%; transform: translateX(-50%) rotate(0deg); bottom: 12px; width: 13px; height: 15px; }
+  .bloom.mist.bells .petal:nth-child(3) { left: auto; right: 22%; transform: rotate(18deg); }
+  .bloom.mist.bells .petal:nth-child(4) { left: 38%; transform: rotate(-8deg); bottom: 20px; opacity: 0.9; }
+  .bloom.mist.bells .petal:nth-child(5) { left: auto; right: 30%; transform: rotate(10deg); bottom: 20px; opacity: 0.9; }
+  .bloom.mint.bells .center,
+  .bloom.mist.bells .center { display: none; }
 
   .plot-label {
     position: absolute;
@@ -909,11 +993,24 @@
     top: 42%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 22px;
-    height: 22px;
-    border: 2px dashed rgba(120, 100, 80, 0.28);
+    width: 26px;
+    height: 26px;
+    border: 2px dashed color-mix(in srgb, var(--ctp-overlay1) 42%, transparent);
     border-radius: 50%;
-    opacity: 0.7;
+    opacity: 0.75;
+    background:
+      radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--ctp-green) 12%, transparent) 0 28%, transparent 30%);
+  }
+  .empty-mark::after {
+    content: "+";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--ctp-overlay1) 70%, var(--ctp-green));
+    line-height: 1;
   }
 
   .dew {
@@ -1025,17 +1122,41 @@
     gap: 8px;
     width: 100%;
   }
+  /* 库存图标位：与 Catppuccin 软卡片同系的 tile */
   .seed-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-    background: var(--paper);
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ctp-base) 92%, var(--ctp-surface0));
     display: grid;
     place-items: center;
     font-size: 1.05rem;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+    box-shadow:
+      inset 0 0 0 1px var(--border-soft),
+      0 2px 6px var(--shadow);
     flex-shrink: 0;
+    overflow: hidden;
   }
+  .seed-icon .seed-art,
+  .seed-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+  }
+  .seed-btn.active .seed-icon {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--ctp-green) 40%, transparent),
+      0 0 0 2px color-mix(in srgb, var(--ctp-green) 20%, transparent);
+  }
+  /* 品种色点缀边框，让图标真正嵌进 UI 色板 */
+  .seed-icon.tint-blush { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ctp-flamingo) 35%, transparent), 0 2px 6px var(--shadow); }
+  .seed-icon.tint-mint  { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ctp-teal) 35%, transparent), 0 2px 6px var(--shadow); }
+  .seed-icon.tint-mist  { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ctp-lavender) 35%, transparent), 0 2px 6px var(--shadow); }
+  .seed-icon.tint-river { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ctp-yellow) 40%, transparent), 0 2px 6px var(--shadow); }
+  .seed-icon.tint-bamboo{ box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ctp-mauve) 35%, transparent), 0 2px 6px var(--shadow); }
   .seed-meta { flex: 1; min-width: 0; }
   .seed-meta strong {
     display: block;
@@ -1147,11 +1268,28 @@
   }
   .action:active { background: #d5efdf; }
   .action.primary {
-    background: linear-gradient(180deg, #8fc9a8, var(--leaf));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-green) 72%, white), var(--leaf));
     color: #fff;
     box-shadow: 0 4px 12px color-mix(in srgb, var(--ctp-green) 35%, transparent);
   }
   .action.primary:active { filter: brightness(0.97); }
+  html.night .action {
+    background: var(--action-bg);
+    color: var(--action-color);
+  }
+  html.night .action:active {
+    background: color-mix(in srgb, var(--ctp-green) 22%, var(--ctp-surface0));
+  }
+  html.night .action.primary {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-green) 78%, var(--ctp-teal)), var(--ctp-green));
+    color: var(--ctp-crust);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--ctp-green) 28%, transparent);
+  }
+  .action .emoji {
+    font-size: 1.05rem;
+    line-height: 1;
+    filter: drop-shadow(0 1px 0 color-mix(in srgb, white 35%, transparent));
+  }
   .action:disabled {
     opacity: 0.42;
     cursor: not-allowed;
@@ -1160,7 +1298,6 @@
     outline: 2px solid var(--leaf-deep);
     outline-offset: 2px;
   }
-  .action .emoji { font-size: 1.05rem; }
 
   /* toast */
   .toast {
@@ -1207,11 +1344,75 @@
     width: min(400px, 100%);
     background: var(--paper);
     border-radius: 24px;
-    padding: 24px 20px 20px;
+    padding: 0 0 20px;
     box-shadow: 0 16px 40px var(--shadow);
     border: 1px solid var(--border-soft);
     text-align: center;
     transition: var(--theme-transition);
+    overflow: hidden;
+  }
+  .intro-hero {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 30%, color-mix(in srgb, var(--ctp-green) 22%, transparent), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 85% 20%, color-mix(in srgb, var(--ctp-pink) 18%, transparent), transparent 55%),
+      linear-gradient(180deg, var(--ctp-mantle), var(--ctp-base));
+  }
+  .intro-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    opacity: 0.92;
+    mix-blend-mode: soft-light;
+  }
+  html.night .intro-hero img {
+    opacity: 0.55;
+    mix-blend-mode: soft-light;
+  }
+  .intro-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, transparent 35%, var(--paper) 96%),
+      radial-gradient(ellipse 70% 50% at 50% 20%, color-mix(in srgb, white 18%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+  .intro-card .intro-body {
+    padding: 2px 20px 0;
+    position: relative;
+  }
+  .intro-brand-mark {
+    width: 58px;
+    height: 58px;
+    margin: -30px auto 12px;
+    border-radius: 50%;
+    object-fit: contain;
+    padding: 8px;
+    background:
+      radial-gradient(circle at 32% 28%, color-mix(in srgb, white 70%, transparent), transparent 55%),
+      var(--paper);
+    box-shadow:
+      0 0 0 3px var(--paper),
+      inset 0 0 0 1px color-mix(in srgb, var(--ctp-teal) 22%, transparent),
+      0 8px 18px color-mix(in srgb, var(--ctp-teal) 24%, transparent);
+    position: relative;
+    z-index: 1;
+    display: block;
+  }
+  html.night .intro-brand-mark {
+    background:
+      radial-gradient(circle at 32% 28%, color-mix(in srgb, white 12%, transparent), transparent 55%),
+      var(--ctp-surface0);
+    box-shadow:
+      0 0 0 3px var(--paper),
+      inset 0 0 0 1px color-mix(in srgb, var(--ctp-teal) 28%, transparent),
+      0 8px 18px color-mix(in srgb, black 35%, transparent);
   }
   .intro-card .badge {
     display: inline-block;
@@ -1237,7 +1438,7 @@
   }
   .intro-card .start {
     border: none;
-    background: linear-gradient(180deg, #8fc9a8, var(--leaf));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-green) 72%, white), var(--leaf));
     color: #fff;
     font: inherit;
     font-size: 0.95rem;
@@ -1250,6 +1451,15 @@
     max-width: 240px;
     box-shadow: 0 8px 20px color-mix(in srgb, var(--ctp-green) 35%, transparent);
     -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
+  }
+  .intro-card .start:hover {
+    filter: brightness(1.03);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--ctp-green) 42%, transparent);
+  }
+  html.night .intro-card .start {
+    color: var(--ctp-crust);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-green) 78%, var(--ctp-teal)), var(--ctp-green));
   }
   .intro-card .start:active { filter: brightness(0.97); }
   .intro-card .start.ghost {
@@ -1526,6 +1736,22 @@
     border-radius: 16px;
     background: var(--surface-soft);
     border: 1px solid var(--border-soft);
+  }
+  .market-row .m-icon,
+  .codex-card .c-icon {
+    overflow: hidden;
+    padding: 0;
+  }
+  .market-row .m-icon .seed-art,
+  .market-row .m-icon img,
+  .codex-card .c-icon .seed-art,
+  .codex-card .c-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    user-select: none;
   }
   .market-row .m-icon {
     width: 42px;
@@ -2115,15 +2341,21 @@
 
   <div class="intro" id="intro">
     <div class="intro-card">
-      <div class="badge">小清新 · 休闲养成</div>
-      <h2>露珠小院</h2>
-      <p>
-        清晨的露水还挂在叶片上。照料南窗花圃，攒几天后
-        就能推开院门出游——雾丘与河岸各有不同的花。
-      </p>
-      <button class="start" id="startBtn" type="button">推开院门</button>
-      <button class="start ghost" id="resetBtn" type="button" hidden>重新开始</button>
-      <p class="intro-save" id="introSaveHint" hidden>检测到本机存档，可继续照料小院。</p>
+      <div class="intro-hero" aria-hidden="true">
+        <img src="assets/intro-hero.jpg" alt="" width="960" height="720" decoding="async" />
+      </div>
+      <div class="intro-body">
+        <img class="intro-brand-mark" src="assets/logo.png" alt="" width="56" height="56" decoding="async" />
+        <div class="badge">小清新 · 休闲养成</div>
+        <h2>露珠小院</h2>
+        <p>
+          清晨的露水还挂在叶片上。照料南窗花圃，攒几天后
+          就能推开院门出游——雾丘与河岸各有不同的花。
+        </p>
+        <button class="start" id="startBtn" type="button">推开院门</button>
+        <button class="start ghost" id="resetBtn" type="button" hidden>重新开始</button>
+        <p class="intro-save" id="introSaveHint" hidden>检测到本机存档，可继续照料小院。</p>
+      </div>
     </div>
   </div>
 
@@ -2131,7 +2363,7 @@
     <header class="topbar">
       <div class="topbar-row">
         <div class="brand">
-          <div class="logo" aria-hidden="true"></div>
+          <img class="logo" src="assets/logo.png" alt="" width="40" height="40" decoding="async" />
           <div>
             <h1>露珠小院</h1>
             <p>DEWDROP COURTYARD</p>
@@ -2256,11 +2488,17 @@
       } catch (e) {}
     })();
 
+    const ASSET = {
+      logo: "assets/logo.png",
+      intro: "assets/intro-hero.jpg",
+    };
+
     const SEEDS = {
       blush: {
         id: "blush",
         name: "胭脂芽",
         icon: "🌸",
+        art: "assets/flower-blush.png",
         desc: "柔软粉瓣，清晨最香",
         cost: 8,
         bloomColor: "blush",
@@ -2269,6 +2507,7 @@
         id: "mint",
         name: "薄荷铃",
         icon: "🌿",
+        art: "assets/flower-mint.png",
         desc: "淡绿小花，带一点凉意",
         cost: 6,
         bloomColor: "mint",
@@ -2277,6 +2516,7 @@
         id: "mist",
         name: "雾铃草",
         icon: "🤍",
+        art: "assets/flower-mist.png",
         desc: "半透明铃花，喜薄雾",
         cost: 10,
         bloomColor: "mist",
@@ -2285,6 +2525,7 @@
         id: "river",
         name: "水仙芽",
         icon: "🌼",
+        art: "assets/flower-river.png",
         desc: "淡黄花瓣，爱湿润砂土",
         cost: 12,
         bloomColor: "river",
@@ -2293,11 +2534,25 @@
         id: "bamboo",
         name: "竹影兰",
         icon: "🎋",
+        art: "assets/flower-bamboo.png",
         desc: "青紫细瓣，喜斑驳竹影",
         cost: 14,
         bloomColor: "bamboo",
       },
     };
+
+    /** 库存 / 图鉴 / 市贸用的软 UI tile 图标 */
+    function seedArtHTML(seed, locked) {
+      if (locked) return "❔";
+      if (seed?.art) {
+        return `<img class="seed-art" src="${seed.art}" alt="" width="42" height="42" draggable="false" decoding="async" />`;
+      }
+      return seed?.icon || "❔";
+    }
+
+    function seedIconClass(seedId) {
+      return "seed-icon tint-" + (SEEDS[seedId]?.bloomColor || seedId || "blush");
+    }
 
     const REGIONS = {
       home: {
@@ -3371,7 +3626,7 @@
             .join("");
           card.innerHTML = `
             <div class="c-head">
-              <div class="c-icon">${any ? seed.icon : "❔"}</div>
+              <div class="c-icon">${seedArtHTML(seed, !any)}</div>
               <div>
                 <div class="c-name">${any ? seed.name : "未记载"}</div>
                 <div class="c-sub">${any ? seed.desc : "种下或遇见后才会写进图鉴"}</div>
@@ -3475,7 +3730,7 @@
           const stock = state.inventory[seed.id] || 0;
           const can = state.coins >= seed.cost;
           row.innerHTML = `
-            <div class="m-icon">${seed.icon}</div>
+            <div class="m-icon">${seedArtHTML(seed)}</div>
             <div class="m-meta">
               <strong>${seed.name}</strong>
               <small>${seed.desc} · 袋中 ×${stock}</small>
@@ -3503,7 +3758,7 @@
           const row = document.createElement("div");
           row.className = "market-row";
           row.innerHTML = `
-            <div class="m-icon">${seed.icon}</div>
+            <div class="m-icon">${seedArtHTML(seed)}</div>
             <div class="m-meta">
               <strong>${seed.name}花束</strong>
               <small>刚从花圃摘下的 · 库存 ×${count}</small>
@@ -3539,10 +3794,10 @@
           const row = document.createElement("div");
           row.className = "market-row" + (q.done ? " quest-done" : "");
           row.innerHTML = `
-            <div class="m-icon">${q.done ? "✅" : q.icon || seed.icon}</div>
+            <div class="m-icon">${q.done ? "✅" : seedArtHTML(seed)}</div>
             <div class="m-meta">
               <strong>${q.client}<span class="quest-badge">${q.done ? "已交" : "待交"}</span></strong>
-              <small>想要 ${seed.icon} ${seed.name}花束 ×${q.qty} · 你有 ×${have}</small>
+              <small>想要 ${seed.name}花束 ×${q.qty} · 你有 ×${have}</small>
               <span class="quest-reward">酬劳 ◎ ${q.reward}</span>
             </div>
             <div class="m-action">
@@ -3905,7 +4160,7 @@
           : `宜${seedHomeRegionName(seed.id)} · 此处不宜`;
         btn.innerHTML = `
           <div class="seed-top">
-            <div class="seed-icon">${seed.icon}</div>
+            <div class="${seedIconClass(seed.id)}">${seedArtHTML(seed)}</div>
             <div class="seed-meta">
               <strong>${seed.name}</strong>
               <small>${where}</small>
@@ -3931,14 +4186,17 @@
 
     function plantHTML(plant) {
       if (!plant) return '<div class="empty-mark" aria-hidden="true"></div>';
-      const species = SEEDS[plant.seedId]?.bloomColor || "blush";
+      const seed = SEEDS[plant.seedId];
+      const species = seed?.bloomColor || "blush";
       if (plant.stage === 0) {
-        return `<div class="plant" aria-hidden="true"><div class="sprout ${species}"></div></div>`;
+        return `<div class="plant stage-0" aria-hidden="true"><div class="sprout ${species}"></div></div>`;
       }
       if (plant.stage === 1) {
-        return `<div class="plant" aria-hidden="true"><div class="bud ${species}"><div class="stem"></div><div class="head"></div></div></div>`;
+        return `<div class="plant stage-1" aria-hidden="true"><div class="bud ${species}"><div class="stem"></div><div class="head"></div></div></div>`;
       }
-      return `<div class="plant" aria-hidden="true"><div class="bloom ${species}">
+      // 花圃内盛开：纯 CSS，与界面同语言；位图只用于库存/市贸/图鉴
+      const bell = species === "mint" || species === "mist" ? " bells" : "";
+      return `<div class="plant stage-2" aria-hidden="true"><div class="bloom ${species}${bell}">
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
         <div class="petal"></div><div class="petal"></div>
         <div class="center"></div><div class="stem"></div>

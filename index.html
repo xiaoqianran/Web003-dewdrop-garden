@@ -1407,10 +1407,11 @@
     font: inherit;
     font-size: var(--fs-sm);
     font-weight: 500;
-    padding: 10px 8px;
+    padding: 10px 4px;
     border-radius: 12px;
     cursor: pointer;
     min-height: 44px;
+    white-space: nowrap;
   }
   .market-tab.active {
     background: var(--surface);
@@ -1506,6 +1507,38 @@
   .market-row button.m-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+  .market-row button.m-btn.quest {
+    background: linear-gradient(160deg, #9bb8d4, #6f94b8);
+  }
+  .market-row button.m-btn.quest-done {
+    background: rgba(120, 140, 130, 0.35);
+    color: var(--ink-soft);
+  }
+  .market-row.quest-done {
+    opacity: 0.72;
+  }
+  .quest-reward {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--fs-xs);
+    color: var(--gold-color, #b8860b);
+    font-weight: 600;
+  }
+  .quest-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: rgba(111, 148, 184, 0.18);
+    color: #5a7a9a;
+    vertical-align: middle;
+  }
+  html.night .quest-badge {
+    background: rgba(140, 180, 210, 0.16);
+    color: #a8c4d8;
   }
 
   .codex-sheet {
@@ -1980,13 +2013,14 @@
     <div class="sheet-head">
       <div>
         <h2 id="marketTitle">市贸广场</h2>
-        <p>旅人支起的小摊——买种子、卖花束，或喝杯茶回点体力。</p>
+        <p>旅人支起的小摊——买种、卖花、接委托，或喝杯茶回点体力。</p>
       </div>
       <button class="sheet-close" id="btnCloseMarket" type="button" aria-label="关闭">×</button>
     </div>
     <div class="market-tabs" role="tablist">
       <button class="market-tab active" type="button" data-tab="buy" role="tab" aria-selected="true">买种</button>
       <button class="market-tab" type="button" data-tab="sell" role="tab" aria-selected="false">卖花</button>
+      <button class="market-tab" type="button" data-tab="quest" role="tab" aria-selected="false">委托</button>
       <button class="market-tab" type="button" data-tab="rest" role="tab" aria-selected="false">小憩</button>
     </div>
     <div class="market-body" id="marketBody"></div>
@@ -2193,9 +2227,10 @@
     const MARKET_UNLOCK_DAY = 2;
     const TEA_COST = 15;
     const TEA_ENERGY = 4;
+    const QUEST_COUNT = 3;
 
     const SAVE_KEY = "dewdrop-save-v1";
-    const SAVE_VERSION = 3;
+    const SAVE_VERSION = 4;
 
     function emptyCodexEntry() {
       return { seen: [false, false, false], harvests: 0, planted: false };
@@ -2211,6 +2246,71 @@
       };
     }
 
+    /** 确定性伪随机 0..1（按 day + salt） */
+    function dayRand(day, salt) {
+      let x = (Math.imul(day + 1, 374761393) ^ Math.imul(salt + 1, 668265263)) >>> 0;
+      x = Math.imul(x ^ (x >>> 13), 1274126177) >>> 0;
+      return (x >>> 0) / 4294967296;
+    }
+
+    const QUEST_CLIENTS = [
+      { name: "路过的旅人", icon: "🧳" },
+      { name: "茶摊阿婆", icon: "🫖" },
+      { name: "写生的少年", icon: "🎨" },
+      { name: "邻院姑娘", icon: "👒" },
+      { name: "收花的货郎", icon: "🛒" },
+      { name: "雨巷诗人", icon: "📜" },
+    ];
+
+    function questRewardFor(seedId, qty) {
+      const base = flowerSellPrice(seedId);
+      // 比市价略高，鼓励接单；数量越多单价略降
+      const unit = base + 4 + Math.floor(base * 0.15);
+      return unit * qty;
+    }
+
+    function generateQuestsForDay(day) {
+      const seedIds = Object.keys(SEEDS);
+      const used = new Set();
+      const list = [];
+      for (let i = 0; i < QUEST_COUNT; i++) {
+        let seedId = seedIds[Math.floor(dayRand(day, i * 3) * seedIds.length)];
+        // 尽量不重复花种
+        let guard = 0;
+        while (used.has(seedId) && guard < 8) {
+          seedId = seedIds[Math.floor(dayRand(day, i * 3 + guard + 1) * seedIds.length)];
+          guard += 1;
+        }
+        used.add(seedId);
+        // 第 1 天轻量 1 束；之后 1~2 束（贵种偏少）
+        let qty = 1;
+        if (day >= 3) {
+          const roll = dayRand(day, i * 7 + 11);
+          qty = roll > 0.55 ? 2 : 1;
+          if (SEEDS[seedId].cost >= 12 && roll < 0.75) qty = 1;
+        }
+        if (day >= 6 && dayRand(day, i * 13 + 5) > 0.82) qty = Math.min(3, qty + 1);
+        const client = QUEST_CLIENTS[Math.floor(dayRand(day, i * 17 + 2) * QUEST_CLIENTS.length)];
+        list.push({
+          id: `d${day}-q${i}`,
+          seedId,
+          qty,
+          reward: questRewardFor(seedId, qty),
+          client: client.name,
+          icon: client.icon,
+          done: false,
+        });
+      }
+      return list;
+    }
+
+    function ensureQuests() {
+      if (!Array.isArray(state.quests) || state.questDay !== state.day) {
+        state.quests = generateQuestsForDay(state.day);
+        state.questDay = state.day;
+      }
+    }
+
     const ACHIEVEMENTS = [
       { id: "first_plant", icon: "🌱", name: "第一颗种子", desc: "在花圃里播下第一颗种子" },
       { id: "first_harvest", icon: "✿", name: "第一束花", desc: "收获第一朵盛开的花" },
@@ -2222,6 +2322,8 @@
       { id: "full_codex", icon: "📔", name: "花谱写满", desc: "见过全部五种花的三个生长阶段" },
       { id: "weather_four", icon: "☁", name: "四时天色", desc: "经历过四种不同的天气" },
       { id: "bamboo_path", icon: "🎋", name: "竹径访客", desc: "第一次抵达竹径闲亭" },
+      { id: "first_quest", icon: "📜", name: "一纸委托", desc: "完成第一份市贸花束委托" },
+      { id: "quest_five", icon: "🎀", name: "热心园丁", desc: "累计完成 5 份委托" },
     ];
 
     function defaultState() {
@@ -2241,6 +2343,9 @@
         achievements: {},
         weatherId: weatherIdForDay(1),
         weatherSeen: {},
+        quests: [],
+        questDay: 0,
+        questsDone: 0,
         regionPlots: {
           home: makePlots(9),
           mist: makePlots(6),
@@ -2257,6 +2362,8 @@
       // 开局已见过胭脂芽花苞
       s.codex.blush.seen[1] = true;
       s.weatherSeen[s.weatherId] = true;
+      s.quests = generateQuestsForDay(1);
+      s.questDay = 1;
       return s;
     }
 
@@ -2277,6 +2384,17 @@
         achievements: { ...state.achievements },
         weatherId: state.weatherId,
         weatherSeen: { ...state.weatherSeen },
+        quests: (state.quests || []).map((q) => ({
+          id: q.id,
+          seedId: q.seedId,
+          qty: q.qty,
+          reward: q.reward,
+          client: q.client,
+          icon: q.icon,
+          done: !!q.done,
+        })),
+        questDay: state.questDay || state.day,
+        questsDone: state.questsDone || 0,
         regionPlots: Object.fromEntries(
           Object.entries(state.regionPlots).map(([rid, plots]) => [
             rid,
@@ -2316,7 +2434,7 @@
         const raw = localStorage.getItem(SAVE_KEY);
         if (!raw) return false;
         const data = JSON.parse(raw);
-        if (!data || ![1, 2, 3, SAVE_VERSION].includes(data.v)) return false;
+        if (!data || ![1, 2, 3, 4, SAVE_VERSION].includes(data.v)) return false;
 
         state.coins = Math.max(0, Number(data.coins) || 0);
         state.energy = Math.max(0, Number(data.energy) || 0);
@@ -2375,6 +2493,33 @@
           });
         }
         state.weatherSeen[state.weatherId] = true;
+
+        // 委托（v4；旧档按当天重 roll）
+        state.questsDone = Math.max(0, Number(data.questsDone) || 0);
+        if (
+          Array.isArray(data.quests) &&
+          Number(data.questDay) === state.day &&
+          data.quests.length
+        ) {
+          state.questDay = state.day;
+          state.quests = data.quests
+            .filter((q) => q && SEEDS[q.seedId])
+            .map((q) => ({
+              id: String(q.id || `d${state.day}-q`),
+              seedId: q.seedId,
+              qty: Math.max(1, Math.min(5, Number(q.qty) || 1)),
+              reward: Math.max(1, Number(q.reward) || questRewardFor(q.seedId, 1)),
+              client: String(q.client || "旅人"),
+              icon: String(q.icon || "📜"),
+              done: !!q.done,
+            }));
+          if (!state.quests.length) {
+            state.quests = generateQuestsForDay(state.day);
+          }
+        } else {
+          state.quests = generateQuestsForDay(state.day);
+          state.questDay = state.day;
+        }
 
         Object.keys(REGIONS).forEach((rid) => {
           const count = REGIONS[rid].plotCount;
@@ -2448,6 +2593,9 @@
       state.codex = fresh.codex;
       state.achievements = fresh.achievements;
       state.weatherSeen = fresh.weatherSeen;
+      state.quests = fresh.quests;
+      state.questDay = fresh.questDay;
+      state.questsDone = fresh.questsDone;
       saveGame();
     }
 
@@ -2605,6 +2753,7 @@
         toast(`市贸广场第 ${MARKET_UNLOCK_DAY} 天开门，再等等`);
         return;
       }
+      ensureQuests();
       renderMarket();
       openSheet(el.marketSheet);
     }
@@ -2656,6 +2805,8 @@
         (k) => state.weatherSeen[k]
       ).length;
       if (seenN >= 4) unlockAchievement("weather_four");
+      if ((state.questsDone || 0) >= 1) unlockAchievement("first_quest");
+      if ((state.questsDone || 0) >= 5) unlockAchievement("quest_five");
     }
 
     function codexStats() {
@@ -2816,6 +2967,48 @@
         body.querySelectorAll("[data-sell]").forEach((btn) => {
           btn.addEventListener("click", () => sellFlower(btn.dataset.sell));
         });
+      } else if (state.marketTab === "quest") {
+        ensureQuests();
+        const doneN = state.quests.filter((q) => q.done).length;
+        const note = document.createElement("p");
+        note.className = "market-note";
+        note.textContent = `今日委托 ${doneN}/${state.quests.length} · 交上花束换酬劳（比零卖略丰）。过夜后刷新。`;
+        body.appendChild(note);
+
+        state.quests.forEach((q) => {
+          const seed = SEEDS[q.seedId];
+          if (!seed) return;
+          const have = state.flowers[q.seedId] || 0;
+          const can = !q.done && have >= q.qty;
+          const row = document.createElement("div");
+          row.className = "market-row" + (q.done ? " quest-done" : "");
+          row.innerHTML = `
+            <div class="m-icon">${q.done ? "✅" : q.icon || seed.icon}</div>
+            <div class="m-meta">
+              <strong>${q.client}<span class="quest-badge">${q.done ? "已交" : "待交"}</span></strong>
+              <small>想要 ${seed.icon} ${seed.name}花束 ×${q.qty} · 你有 ×${have}</small>
+              <span class="quest-reward">酬劳 ◎ ${q.reward}</span>
+            </div>
+            <div class="m-action">
+              <span class="m-price">${q.done ? "完成" : `需 ×${q.qty}`}</span>
+              <button class="m-btn quest${q.done ? " quest-done" : ""}" type="button"
+                data-quest="${q.id}" ${can ? "" : "disabled"}>
+                ${q.done ? "已交付" : "交付"}
+              </button>
+            </div>`;
+          body.appendChild(row);
+        });
+
+        if (!state.quests.length) {
+          const empty = document.createElement("p");
+          empty.className = "market-note";
+          empty.textContent = "今天还没有委托，明天再来看看。";
+          body.appendChild(empty);
+        }
+
+        body.querySelectorAll("[data-quest]").forEach((btn) => {
+          btn.addEventListener("click", () => fulfillQuest(btn.dataset.quest));
+        });
       } else {
         const note = document.createElement("p");
         note.className = "market-note";
@@ -2838,6 +3031,35 @@
         const teaBtn = body.querySelector("#btnBuyTea");
         if (teaBtn) teaBtn.addEventListener("click", buyTea);
       }
+    }
+
+    function fulfillQuest(questId) {
+      ensureQuests();
+      const q = state.quests.find((x) => x.id === questId);
+      if (!q || q.done) {
+        toast("这份委托已经完成了");
+        return;
+      }
+      const seed = SEEDS[q.seedId];
+      if (!seed) return;
+      const have = state.flowers[q.seedId] || 0;
+      if (have < q.qty) {
+        toast(`还差 ${seed.name}花束 ×${q.qty - have}`);
+        return;
+      }
+      state.flowers[q.seedId] -= q.qty;
+      state.coins += q.reward;
+      q.done = true;
+      state.questsDone = (state.questsDone || 0) + 1;
+      unlockAchievement("first_quest");
+      unlockAchievement("first_market");
+      checkAchievements();
+      log(
+        `完成委托：给「${q.client}」送上 ${seed.name}花束 ×${q.qty}，◎ +${q.reward}`
+      );
+      toast(`委托完成 · +${q.reward} ◎`);
+      updateHud();
+      renderMarket();
     }
 
     function buySeed(seedId) {
@@ -3282,10 +3504,15 @@
         }
       });
       if (state.day === MARKET_UNLOCK_DAY) {
-        log("市贸广场开张了——可以买种、卖花、喝杯茶");
+        log("市贸广场开张了——可以买种、卖花、接委托、喝杯茶");
         toast("市贸广场开张");
         el.btnMarket.disabled = false;
       }
+
+      // 每日委托刷新
+      state.quests = generateQuestsForDay(state.day);
+      state.questDay = state.day;
+
       checkAchievements();
 
       let msg = grew

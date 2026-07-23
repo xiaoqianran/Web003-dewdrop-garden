@@ -165,6 +165,14 @@
       radial-gradient(circle at 78% 22%, rgba(180, 230, 240, 0.18) 0 2%, transparent 3%),
       linear-gradient(180deg, #1a3038 0%, #223840 55%, transparent 100%) !important;
   }
+  html.night .garden-panel.theme-bamboo {
+    background: linear-gradient(180deg, rgba(32, 48, 36, 0.88), rgba(32, 42, 36, 0.72));
+  }
+  html.night .garden-panel.theme-bamboo .garden-sky {
+    background:
+      radial-gradient(circle at 78% 22%, rgba(180, 220, 160, 0.16) 0 2%, transparent 3%),
+      linear-gradient(180deg, #1a2c20 0%, #243428 55%, transparent 100%) !important;
+  }
   html.night .region-card {
     background: linear-gradient(135deg, rgba(40, 52, 60, 0.98), rgba(50, 70, 62, 0.45));
     border-color: rgba(126, 196, 160, 0.22);
@@ -176,6 +184,10 @@
   html.night .region-card.theme-river {
     background: linear-gradient(135deg, #243840, #1e3438);
     border-color: rgba(100, 170, 185, 0.3);
+  }
+  html.night .region-card.theme-bamboo {
+    background: linear-gradient(135deg, #2a3828, #243420);
+    border-color: rgba(110, 160, 100, 0.3);
   }
   html.night .region-card .tag {
     background: rgba(0, 0, 0, 0.25);
@@ -794,6 +806,32 @@
     background: radial-gradient(circle at 35% 35%, #fff0a0, #e89830);
   }
 
+  /* 竹影兰 · 青紫 */
+  .sprout.bamboo {
+    background: linear-gradient(180deg, #9ec9a8, #4d7a5c);
+  }
+  .sprout.bamboo::before, .sprout.bamboo::after {
+    background: linear-gradient(135deg, #c8b8e0, #8a78b0);
+  }
+  .bud.bamboo .head {
+    background:
+      radial-gradient(circle at 35% 28%, rgba(255,255,255,0.55), transparent 42%),
+      radial-gradient(circle at 50% 55%, #d4c4f0, #8a70c0);
+    box-shadow: 0 2px 6px rgba(100, 80, 160, 0.22);
+  }
+  .bloom.bamboo .petal:nth-child(1),
+  .bloom.bamboo .petal:nth-child(3),
+  .bloom.bamboo .petal:nth-child(5) {
+    background: linear-gradient(180deg, #f0e8ff, #c0a8e8);
+  }
+  .bloom.bamboo .petal:nth-child(2),
+  .bloom.bamboo .petal:nth-child(4) {
+    background: linear-gradient(180deg, #dcc8f4, #9878d0);
+  }
+  .bloom.bamboo .center {
+    background: radial-gradient(circle at 35% 35%, #e8f8d8, #88b868);
+  }
+
   .plot-label {
     position: absolute;
     bottom: 5px;
@@ -1246,6 +1284,12 @@
   }
   .garden-panel.theme-river .garden-sky {
     background: linear-gradient(180deg, #b8dde6 0%, #e5f4f6 55%, transparent 100%);
+  }
+  .garden-panel.theme-bamboo {
+    background: linear-gradient(180deg, rgba(210, 230, 200, 0.6), rgba(255, 253, 248, 0.55));
+  }
+  .garden-panel.theme-bamboo .garden-sky {
+    background: linear-gradient(180deg, #c5dfb8 0%, #e8f2e0 55%, transparent 100%);
   }
   .garden-header .region-tools {
     display: flex;
@@ -1746,6 +1790,10 @@
     background: linear-gradient(135deg, #f3fbfc, #dceff2);
     border-color: rgba(100, 170, 185, 0.35);
   }
+  .region-card.theme-bamboo {
+    background: linear-gradient(135deg, #f4faf0, #dcecd0);
+    border-color: rgba(110, 160, 100, 0.35);
+  }
   .region-card.current {
     box-shadow: 0 0 0 2px rgba(111,175,142,0.45);
   }
@@ -2007,6 +2055,14 @@
         cost: 12,
         bloomColor: "river",
       },
+      bamboo: {
+        id: "bamboo",
+        name: "竹影兰",
+        icon: "🎋",
+        desc: "青紫细瓣，喜斑驳竹影",
+        cost: 14,
+        bloomColor: "bamboo",
+      },
     };
 
     const REGIONS = {
@@ -2046,6 +2102,20 @@
         seedIds: ["river"],
         harvestBonus: 3,
         doubleGrowthChance: 0.35,
+      },
+      bamboo: {
+        id: "bamboo",
+        name: "竹径闲亭",
+        desc: "竹影婆娑的小径深处，竹影兰在这里最自在。",
+        weather: "🎋 斑驳 · 浇水更省体力",
+        theme: "bamboo",
+        unlockDay: 5,
+        travelCost: 3,
+        plotCount: 6,
+        seedIds: ["bamboo", "mint"],
+        harvestBonus: 4,
+        waterCost: 0, // 竹径浇水免费
+        energyOnRest: 2, // 过夜在此地时额外回体力（见 rest）
       },
     };
 
@@ -2137,6 +2207,7 @@
         mint: emptyCodexEntry(),
         mist: emptyCodexEntry(),
         river: emptyCodexEntry(),
+        bamboo: emptyCodexEntry(),
       };
     }
 
@@ -2147,9 +2218,10 @@
       { id: "first_market", icon: "🏪", name: "市贸常客", desc: "在市贸广场完成一笔买卖或喝茶" },
       { id: "day5", icon: "☀", name: "五日小院", desc: "照料小院到第 5 天" },
       { id: "coins100", icon: "◎", name: "小有积蓄", desc: "手里攒到 100 金币" },
-      { id: "all_harvest", icon: "🌸", name: "四时花开", desc: "四种花都至少收获过一次" },
-      { id: "full_codex", icon: "📔", name: "花谱写满", desc: "见过全部四种花的三个生长阶段" },
+      { id: "all_harvest", icon: "🌸", name: "五色花开", desc: "五种花都至少收获过一次" },
+      { id: "full_codex", icon: "📔", name: "花谱写满", desc: "见过全部五种花的三个生长阶段" },
       { id: "weather_four", icon: "☁", name: "四时天色", desc: "经历过四种不同的天气" },
+      { id: "bamboo_path", icon: "🎋", name: "竹径访客", desc: "第一次抵达竹径闲亭" },
     ];
 
     function defaultState() {
@@ -2161,8 +2233,8 @@
         regionId: "home",
         selectedSeed: "blush",
         selectedPlot: null,
-        inventory: { blush: 3, mint: 2, mist: 1, river: 1 },
-        flowers: { blush: 0, mint: 0, mist: 0, river: 0 },
+        inventory: { blush: 3, mint: 2, mist: 1, river: 1, bamboo: 0 },
+        flowers: { blush: 0, mint: 0, mist: 0, river: 0, bamboo: 0 },
         marketTab: "buy",
         codexTab: "plants",
         codex: defaultCodex(),
@@ -2173,6 +2245,7 @@
           home: makePlots(9),
           mist: makePlots(6),
           river: makePlots(6),
+          bamboo: makePlots(6),
         },
       };
       // starter plant in home center
@@ -2256,14 +2329,14 @@
         state.selectedPlot = null;
         state.marketTab = "buy";
 
-        state.inventory = { blush: 0, mint: 0, mist: 0, river: 0 };
+        state.inventory = { blush: 0, mint: 0, mist: 0, river: 0, bamboo: 0 };
         if (data.inventory && typeof data.inventory === "object") {
           Object.keys(state.inventory).forEach((k) => {
             state.inventory[k] = Math.max(0, Number(data.inventory[k]) || 0);
           });
         }
 
-        state.flowers = { blush: 0, mint: 0, mist: 0, river: 0 };
+        state.flowers = { blush: 0, mint: 0, mist: 0, river: 0, bamboo: 0 };
         if (data.flowers && typeof data.flowers === "object") {
           Object.keys(state.flowers).forEach((k) => {
             state.flowers[k] = Math.max(0, Number(data.flowers[k]) || 0);
@@ -2594,7 +2667,8 @@
         stages += n;
         if (n > 0) known += 1;
       });
-      return { stages, known, totalStages: 12, totalPlants: 4 };
+      const plantN = Object.keys(SEEDS).length;
+      return { stages, known, totalStages: plantN * 3, totalPlants: plantN };
     }
 
     function renderCodex() {
@@ -2884,6 +2958,9 @@
       if (regionId !== "home") {
         unlockAchievement("first_travel");
       }
+      if (regionId === "bamboo") {
+        unlockAchievement("bamboo_path");
+      }
       log(
         region.id === "home"
           ? "推开院门，回到了南窗花圃"
@@ -2989,7 +3066,7 @@
     function updateHud() {
       el.coins.textContent = state.coins;
       el.energy.textContent = state.energy;
-      el.energyMax.textContent = state.maxEnergy;
+      el.energyMax.textContent = Math.max(state.maxEnergy, state.energy);
       el.day.textContent = state.day;
       saveGame();
       const plots = currentPlots();
@@ -3069,11 +3146,16 @@
         toast("今天已经浇过了，明天再来");
         return;
       }
-      const freeWater = !!currentWeather().freeWater;
+      const region = currentRegion();
+      const freeWater =
+        !!currentWeather().freeWater || region.waterCost === 0;
       if (!freeWater && !spendEnergy(1)) return;
 
       plot.plant.wateredToday = true;
-      if (freeWater) {
+      if (region.waterCost === 0) {
+        log(`竹影下给「${SEEDS[plot.plant.seedId].name}」浇了水（不费体力）`);
+        toast("浇水完成 · 竹径清凉");
+      } else if (currentWeather().freeWater) {
         log(`暖阳下给「${SEEDS[plot.plant.seedId].name}」浇了水（不费体力）`);
         toast("浇水完成 · 暖阳省力");
       } else {
@@ -3130,8 +3212,10 @@
     el.btnRest.addEventListener("click", () => {
       // 过夜结算用「今天」的天气，天亮后再换新天气
       const nightWx = currentWeather();
+      const restRegion = currentRegion();
       state.day += 1;
-      state.energy = state.maxEnergy;
+      // 竹径闲亭：在此地过夜，次日体力回满并额外 +2（可短暂超过上限）
+      state.energy = state.maxEnergy + (restRegion.energyOnRest || 0);
       let grew = 0;
       let bonusGrew = 0;
       let rainGrew = 0;

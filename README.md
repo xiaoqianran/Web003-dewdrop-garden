@@ -71,9 +71,25 @@ GitHub Pages：https://xiaoqianran.github.io/Web003-dewdrop-garden/
 | 🌸 花信 | 收获金币与种子更丰 |
 | 🍃 微风 | 出游体力消耗 −1 |
 
+## 素材资源
+
+插画资源放在 `assets/`，与 Catppuccin 小清新风格统一：
+
+| 文件 | 用途 |
+|------|------|
+| `logo.png` | 顶栏 / 开场 Logo、favicon |
+| `intro-hero.jpg` | 开场页插画 |
+| `flower-blush.png` | 胭脂芽（种子袋 / 图鉴 / 市贸 / 盛开） |
+| `flower-mint.png` | 薄荷铃 |
+| `flower-mist.png` | 雾铃草 |
+| `flower-river.png` | 水仙芽 |
+| `flower-bamboo.png` | 竹影兰 |
+
+库存 / 市贸 / 图鉴使用软 UI 花种 tile；**花圃内植株全程 CSS**（与界面同语言，避免插画突兀）。白天 **Latte**、黑夜 **Mocha** 配色不变。
+
 ## 本地运行
 
-用浏览器直接打开 `index.html` 即可，无需构建。
+用浏览器直接打开 `index.html` 即可，无需构建（需与 `assets/` 同目录）。
 
 ## 部署
 
@@ -81,7 +97,7 @@ GitHub Pages：https://xiaoqianran.github.io/Web003-dewdrop-garden/
 
 - 工作流：`.github/workflows/deploy-pages.yml`
 - 触发：`main` 分支 push，或手动 `workflow_dispatch`
-- 产物：仅上传 `index.html` 到 Pages
+- 产物：上传 `index.html` **与** `assets/` 目录到 Pages
 
 ## 提交规范
 

@@ -30,6 +30,10 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html _site/
+          # 插画 / UI 素材
+          if [ -d assets ]; then
+            cp -r assets _site/assets
+          fi
           # 防止部分托管环境误走 Jekyll
           touch _site/.nojekyll
 

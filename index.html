@@ -443,7 +443,7 @@
     max-width: 16em;
   }
   .weather {
-    display: none;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     background: var(--weather-bg);
@@ -454,7 +454,73 @@
     border: 1px solid var(--border-soft);
     white-space: nowrap;
     flex-shrink: 0;
+    max-width: min(52vw, 220px);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+  .weather strong {
+    font-weight: 600;
+    color: var(--leaf-deep);
+  }
+  .garden-panel.wx-clear .garden-sky {
+    background:
+      radial-gradient(circle at 78% 28%, rgba(255,255,255,0.75) 0 8%, transparent 9%),
+      linear-gradient(180deg, rgba(190, 226, 214, 0.55), transparent 80%);
+  }
+  .garden-panel.wx-rain .garden-sky {
+    background:
+      linear-gradient(180deg, rgba(150, 180, 200, 0.55) 0%, rgba(200, 220, 225, 0.35) 60%, transparent 100%);
+  }
+  .garden-panel.wx-rain::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.35;
+    background: repeating-linear-gradient(
+      -18deg,
+      transparent,
+      transparent 8px,
+      rgba(120, 160, 190, 0.18) 8px,
+      rgba(120, 160, 190, 0.18) 10px
+    );
+    animation: rain-drift 1.2s linear infinite;
+  }
+  @keyframes rain-drift {
+    from { background-position: 0 0; }
+    to { background-position: 12px 28px; }
+  }
+  .garden-panel.wx-golden .garden-sky {
+    background:
+      radial-gradient(circle at 72% 22%, rgba(255, 230, 160, 0.55) 0 12%, transparent 14%),
+      linear-gradient(180deg, rgba(255, 220, 170, 0.45), transparent 75%);
+  }
+  .garden-panel.wx-misty .garden-sky {
+    background: linear-gradient(180deg, rgba(200, 210, 220, 0.7) 0%, rgba(220, 230, 235, 0.4) 55%, transparent 100%);
+  }
+  .garden-panel.wx-pollen .garden-sky {
+    background:
+      radial-gradient(circle at 30% 40%, rgba(255, 200, 210, 0.35) 0 6%, transparent 8%),
+      radial-gradient(circle at 70% 30%, rgba(255, 230, 180, 0.4) 0 5%, transparent 7%),
+      linear-gradient(180deg, rgba(255, 228, 210, 0.4), transparent 80%);
+  }
+  .garden-panel.wx-breeze .garden-sky {
+    background:
+      linear-gradient(180deg, rgba(190, 230, 220, 0.5), transparent 80%);
+  }
+  .garden-panel.wx-breeze .cloud {
+    animation-duration: 22s !important;
+  }
+  html.night .garden-panel.wx-rain .garden-sky {
+    background: linear-gradient(180deg, rgba(40, 60, 80, 0.7), transparent 80%);
+  }
+  html.night .garden-panel.wx-golden .garden-sky {
+    background:
+      radial-gradient(circle at 72% 22%, rgba(255, 210, 120, 0.2) 0 10%, transparent 12%),
+      linear-gradient(180deg, rgba(50, 55, 70, 0.5), transparent 80%);
+  }
+
 
   .plots {
     position: relative;
@@ -1987,12 +2053,79 @@
       return Array.from({ length: n }, (_, i) => ({ id: i, plant: null }));
     }
 
+    /** 每日天气：过夜时刷新，影响浇水/生长/出游/收获 */
+    const WEATHERS = {
+      clear: {
+        id: "clear",
+        icon: "☀",
+        name: "晴日",
+        label: "☀ 晴日 · 适宜生长",
+        hint: "天气正好，按平常节奏照料就好。",
+      },
+      rain: {
+        id: "rain",
+        icon: "🌧",
+        name: "细雨",
+        label: "🌧 细雨 · 未浇也有机会长",
+        hint: "夜里落细雨，没浇水的植株也有几率抽芽。",
+        unwateredGrowChance: 0.45,
+      },
+      golden: {
+        id: "golden",
+        icon: "🌤",
+        name: "暖阳",
+        label: "🌤 暖阳 · 浇水不费体力",
+        hint: "阳光温柔，今天浇水不消耗体力。",
+        freeWater: true,
+      },
+      misty: {
+        id: "misty",
+        icon: "🌫",
+        name: "薄雾",
+        label: "🌫 薄雾 · 生长略缓",
+        hint: "雾气沉沉，浇过水的花也只有部分会继续长。",
+        growChance: 0.65,
+      },
+      pollen: {
+        id: "pollen",
+        icon: "🌸",
+        name: "花信",
+        label: "🌸 花信 · 收获更丰",
+        hint: "空气里都是花粉，今天收获多一枚种子、多一点金币。",
+        harvestCoinBonus: 2,
+        harvestSeedBonus: 1,
+      },
+      breeze: {
+        id: "breeze",
+        icon: "🍃",
+        name: "微风",
+        label: "🍃 微风 · 出游省力",
+        hint: "顺风顺路，出游体力消耗减 1（最低 0）。",
+        travelCostReduce: 1,
+      },
+    };
+
+    const WEATHER_ORDER = ["clear", "rain", "golden", "misty", "pollen", "breeze"];
+
+    /** 用天数做确定性随机，同一天刷新页面天气不变 */
+    function weatherIdForDay(day) {
+      let x = (Number(day) || 1) * 2654435761;
+      x = Math.imul(x ^ (x >>> 16), 2246822507);
+      x = Math.imul(x ^ (x >>> 13), 3266489909);
+      x = (x ^ (x >>> 16)) >>> 0;
+      return WEATHER_ORDER[x % WEATHER_ORDER.length];
+    }
+
+    function currentWeather() {
+      return WEATHERS[state.weatherId] || WEATHERS.clear;
+    }
+
     const MARKET_UNLOCK_DAY = 2;
     const TEA_COST = 15;
     const TEA_ENERGY = 4;
 
     const SAVE_KEY = "dewdrop-save-v1";
-    const SAVE_VERSION = 2;
+    const SAVE_VERSION = 3;
 
     function emptyCodexEntry() {
       return { seen: [false, false, false], harvests: 0, planted: false };
@@ -2016,6 +2149,7 @@
       { id: "coins100", icon: "◎", name: "小有积蓄", desc: "手里攒到 100 金币" },
       { id: "all_harvest", icon: "🌸", name: "四时花开", desc: "四种花都至少收获过一次" },
       { id: "full_codex", icon: "📔", name: "花谱写满", desc: "见过全部四种花的三个生长阶段" },
+      { id: "weather_four", icon: "☁", name: "四时天色", desc: "经历过四种不同的天气" },
     ];
 
     function defaultState() {
@@ -2033,6 +2167,8 @@
         codexTab: "plants",
         codex: defaultCodex(),
         achievements: {},
+        weatherId: weatherIdForDay(1),
+        weatherSeen: {},
         regionPlots: {
           home: makePlots(9),
           mist: makePlots(6),
@@ -2047,6 +2183,7 @@
       };
       // 开局已见过胭脂芽花苞
       s.codex.blush.seen[1] = true;
+      s.weatherSeen[s.weatherId] = true;
       return s;
     }
 
@@ -2065,6 +2202,8 @@
         flowers: { ...state.flowers },
         codex: state.codex,
         achievements: { ...state.achievements },
+        weatherId: state.weatherId,
+        weatherSeen: { ...state.weatherSeen },
         regionPlots: Object.fromEntries(
           Object.entries(state.regionPlots).map(([rid, plots]) => [
             rid,
@@ -2104,7 +2243,7 @@
         const raw = localStorage.getItem(SAVE_KEY);
         if (!raw) return false;
         const data = JSON.parse(raw);
-        if (!data || (data.v !== 1 && data.v !== 2 && data.v !== SAVE_VERSION)) return false;
+        if (!data || ![1, 2, 3, SAVE_VERSION].includes(data.v)) return false;
 
         state.coins = Math.max(0, Number(data.coins) || 0);
         state.energy = Math.max(0, Number(data.energy) || 0);
@@ -2150,6 +2289,19 @@
           });
         }
         state.codexTab = "plants";
+
+        if (data.weatherId && WEATHERS[data.weatherId]) {
+          state.weatherId = data.weatherId;
+        } else {
+          state.weatherId = weatherIdForDay(state.day);
+        }
+        state.weatherSeen = {};
+        if (data.weatherSeen && typeof data.weatherSeen === "object") {
+          Object.keys(data.weatherSeen).forEach((id) => {
+            if (data.weatherSeen[id] && WEATHERS[id]) state.weatherSeen[id] = true;
+          });
+        }
+        state.weatherSeen[state.weatherId] = true;
 
         Object.keys(REGIONS).forEach((rid) => {
           const count = REGIONS[rid].plotCount;
@@ -2216,10 +2368,13 @@
       Object.keys(fresh).forEach((k) => {
         state[k] = fresh[k];
       });
-      // deep replace regionPlots
+      // deep replace nested objects
       state.regionPlots = fresh.regionPlots;
       state.inventory = fresh.inventory;
       state.flowers = fresh.flowers;
+      state.codex = fresh.codex;
+      state.achievements = fresh.achievements;
+      state.weatherSeen = fresh.weatherSeen;
       saveGame();
     }
 
@@ -2424,6 +2579,10 @@
         return s[0] && s[1] && s[2];
       });
       if (full) unlockAchievement("full_codex");
+      const seenN = Object.keys(state.weatherSeen || {}).filter(
+        (k) => state.weatherSeen[k]
+      ).length;
+      if (seenN >= 4) unlockAchievement("weather_four");
     }
 
     function codexStats() {
@@ -2711,7 +2870,10 @@
         toast(`再过几天吧——第 ${region.unlockDay} 天才能去`);
         return;
       }
-      if (region.travelCost > 0 && !spendEnergy(region.travelCost)) return;
+      let travelCost = region.travelCost || 0;
+      const reduce = currentWeather().travelCostReduce || 0;
+      if (reduce) travelCost = Math.max(0, travelCost - reduce);
+      if (travelCost > 0 && !spendEnergy(travelCost)) return;
 
       state.regionId = regionId;
       state.selectedPlot = null;
@@ -2725,7 +2887,13 @@
       log(
         region.id === "home"
           ? "推开院门，回到了南窗花圃"
-          : `步行前往「${region.name}」${region.travelCost ? `（体力 −${region.travelCost}）` : ""}`
+          : `步行前往「${region.name}」${
+              travelCost
+                ? `（体力 −${travelCost}${reduce ? " · 微风减耗" : ""}）`
+                : reduce && region.travelCost
+                  ? "（微风送行 · 免体力）"
+                  : ""
+            }`
       );
       toast(region.id === "home" ? "回到小院" : `抵达 ${region.name}`);
       el.hint.textContent = `这里适合种：${region.seedIds.map((id) => SEEDS[id].name).join("、")}`;
@@ -2735,9 +2903,12 @@
 
     function renderRegionChrome() {
       const region = currentRegion();
+      const wx = currentWeather();
       el.regionTitle.textContent = region.name;
-      el.regionWeather.textContent = region.weather;
-      el.gardenPanel.className = "garden-panel theme-" + region.theme;
+      el.regionWeather.textContent = wx.label;
+      el.regionWeather.title = wx.hint;
+      el.gardenPanel.className =
+        "garden-panel theme-" + region.theme + " wx-" + wx.id;
       el.plots.setAttribute("aria-label", region.name + "花圃");
     }
 
@@ -2898,11 +3069,17 @@
         toast("今天已经浇过了，明天再来");
         return;
       }
-      if (!spendEnergy(1)) return;
+      const freeWater = !!currentWeather().freeWater;
+      if (!freeWater && !spendEnergy(1)) return;
 
       plot.plant.wateredToday = true;
-      log(`给「${SEEDS[plot.plant.seedId].name}」浇了一瓢清凉的水`);
-      toast("浇水完成 ✧");
+      if (freeWater) {
+        log(`暖阳下给「${SEEDS[plot.plant.seedId].name}」浇了水（不费体力）`);
+        toast("浇水完成 · 暖阳省力");
+      } else {
+        log(`给「${SEEDS[plot.plant.seedId].name}」浇了一瓢清凉的水`);
+        toast("浇水完成 ✧");
+      }
       el.hint.textContent = "土变湿了。点「过夜」，花会悄悄长大";
 
       const plotBtn = el.plots.children[state.selectedPlot];
@@ -2927,8 +3104,11 @@
       if (!spendEnergy(1)) return;
 
       const seed = SEEDS[plot.plant.seedId];
-      const gain = seed.cost + 4 + (region.harvestBonus || 0);
-      const seedGain = 1 + (Math.random() > 0.55 ? 1 : 0);
+      const wx = currentWeather();
+      const gain =
+        seed.cost + 4 + (region.harvestBonus || 0) + (wx.harvestCoinBonus || 0);
+      let seedGain = 1 + (Math.random() > 0.55 ? 1 : 0);
+      if (wx.harvestSeedBonus) seedGain += wx.harvestSeedBonus;
       state.coins += gain;
       state.inventory[seed.id] = (state.inventory[seed.id] || 0) + seedGain;
       state.flowers[seed.id] = (state.flowers[seed.id] || 0) + 1;
@@ -2936,8 +3116,9 @@
       notePlantSeen(seed.id, 2);
       unlockAchievement("first_harvest");
       checkAchievements();
+      const pollenNote = wx.harvestCoinBonus ? "（花信加成）" : "";
       log(
-        `在「${region.name}」收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}，花束 +1`
+        `在「${region.name}」收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}，花束 +1${pollenNote}`
       );
       toast(`收获啦 · +${gain} ◎ · 花束 +1`);
       plot.plant = null;
@@ -2947,15 +3128,31 @@
     });
 
     el.btnRest.addEventListener("click", () => {
+      // 过夜结算用「今天」的天气，天亮后再换新天气
+      const nightWx = currentWeather();
       state.day += 1;
       state.energy = state.maxEnergy;
       let grew = 0;
       let bonusGrew = 0;
+      let rainGrew = 0;
+      let mistSkip = 0;
 
       Object.values(REGIONS).forEach((region) => {
         const plots = state.regionPlots[region.id];
         plots.forEach((p) => {
-          if (p.plant && p.plant.wateredToday && p.plant.stage < 2) {
+          if (!p.plant) return;
+
+          if (p.plant.wateredToday && p.plant.stage < 2) {
+            // 薄雾：浇过水也可能不长
+            if (
+              nightWx.growChance != null &&
+              Math.random() >= nightWx.growChance
+            ) {
+              p.plant.wateredToday = false;
+              mistSkip += 1;
+              notePlantSeen(p.plant.seedId, p.plant.stage);
+              return;
+            }
             p.plant.stage += 1;
             p.plant.wateredToday = false;
             grew += 1;
@@ -2971,11 +3168,27 @@
               notePlantSeen(p.plant.seedId, p.plant.stage);
             }
           } else if (p.plant) {
+            // 细雨：未浇水也可能长
+            if (
+              p.plant.stage < 2 &&
+              nightWx.unwateredGrowChance &&
+              Math.random() < nightWx.unwateredGrowChance
+            ) {
+              p.plant.stage += 1;
+              rainGrew += 1;
+              grew += 1;
+              notePlantSeen(p.plant.seedId, p.plant.stage);
+            }
             p.plant.wateredToday = false;
             notePlantSeen(p.plant.seedId, p.plant.stage);
           }
         });
       });
+
+      // 新一天天气
+      state.weatherId = weatherIdForDay(state.day);
+      state.weatherSeen[state.weatherId] = true;
+      const dayWx = currentWeather();
 
       // unlock notices
       Object.values(REGIONS).forEach((region) => {
@@ -2995,11 +3208,12 @@
         ? `天亮了。各地共有 ${grew} 株植物又长高了一点`
         : "天亮了。今天的花圃静悄悄的";
       if (bonusGrew) msg += `（河岸额外抽芽 ${bonusGrew} 次）`;
+      if (rainGrew) msg += `（细雨润了 ${rainGrew} 株）`;
+      if (mistSkip) msg += `（薄雾耽搁 ${mistSkip} 株）`;
       log(msg);
-      toast(`第 ${state.day} 天 · 体力已回满`);
-      el.hint.textContent = grew
-        ? "有花长大了——别忘了别处的花圃"
-        : "新的一天，浇浇水，或点「出游」去看看";
+      log(`今日天气：${dayWx.label}——${dayWx.hint}`);
+      toast(`第 ${state.day} 天 · ${dayWx.icon} ${dayWx.name}`);
+      el.hint.textContent = dayWx.hint;
       renderAll();
     });
 

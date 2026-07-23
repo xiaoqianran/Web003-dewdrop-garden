@@ -2143,12 +2143,13 @@
     <div class="sheet-head">
       <div>
         <h2 id="codexTitle">小院图鉴</h2>
-        <p>记下见过的花与悄悄达成的小事。</p>
+        <p>记下见过的花、访客与悄悄达成的小事。</p>
       </div>
       <button class="sheet-close" id="btnCloseCodex" type="button" aria-label="关闭">×</button>
     </div>
     <div class="market-tabs" role="tablist">
       <button class="market-tab active" type="button" data-codex-tab="plants" role="tab" aria-selected="true">花草</button>
+      <button class="market-tab" type="button" data-codex-tab="guests" role="tab" aria-selected="false">访客</button>
       <button class="market-tab" type="button" data-codex-tab="achieve" role="tab" aria-selected="false">成就</button>
     </div>
     <div class="market-body" id="codexBody"></div>
@@ -2344,7 +2345,7 @@
     const VISITOR_UNLOCK_DAY = 4;
 
     const SAVE_KEY = "dewdrop-save-v1";
-    const SAVE_VERSION = 6;
+    const SAVE_VERSION = 7;
 
     const DECORS = {
       lantern: {
@@ -2559,9 +2560,40 @@
       return "";
     }
 
+    /** 来访次数 → 交情称谓 */
+    function favorTitle(visits) {
+      if (!visits || visits <= 0) return "未见面";
+      if (visits === 1) return "初识";
+      if (visits <= 3) return "面熟";
+      if (visits <= 5) return "常客";
+      return "老友";
+    }
+
+    /** 按累计来访次数提升礼物（第 n 次来访用 n） */
+    function scaleVisitorGift(baseGift, visits) {
+      if (!baseGift) return null;
+      const n = Math.max(1, visits || 1);
+      if (baseGift.type === "coins") {
+        const bonus = Math.min(12, (n - 1) * 2);
+        return { type: "coins", amount: baseGift.amount + bonus };
+      }
+      if (baseGift.type === "seed") {
+        let amount = baseGift.amount;
+        if (n >= 3) amount += 1;
+        if (n >= 6) amount += 1;
+        return {
+          type: "seed",
+          seedId: baseGift.seedId,
+          amount,
+        };
+      }
+      return { ...baseGift };
+    }
+
     /**
      * 按天数确定性生成今日访客。
      * 装点越多来访概率越高；对应 prefer 装点会提高该访客权重。
+     * 礼物按该访客历史来访次数（含本次）加成。
      */
     function rollVisitorForDay(day) {
       if (day < VISITOR_UNLOCK_DAY) return null;
@@ -2576,6 +2608,10 @@
         let w = 1;
         if (v.prefer && state.decors && state.decors[v.prefer]) w += 2.4;
         if (!v.prefer) w += 0.35; // 无偏好的路人也常来
+        // 略微偏爱尚未深交的客人，避免总是同一位
+        const met = (state.visitorFavor && state.visitorFavor[v.id]) || 0;
+        if (met === 0) w += 0.4;
+        else if (met >= 5) w += 0.15; // 老友仍会来
         total += w;
         return w;
       });
@@ -2588,22 +2624,24 @@
           break;
         }
       }
+      const prev = (state.visitorFavor && state.visitorFavor[pick.id]) || 0;
+      const visits = prev + 1; // 含本次
       return {
         id: pick.id,
         name: pick.name,
         icon: pick.icon,
         line: pick.line,
-        gift: { ...pick.gift },
+        gift: scaleVisitorGift(pick.gift, visits),
+        favor: visits,
+        favorLabel: favorTitle(visits),
         day,
       };
     }
 
     function ensureVisitor() {
       if (state.visitorDay === state.day) return;
-      // 旧档或新一天：按当前天 roll（不重复发礼物）
       state.todayVisitor = rollVisitorForDay(state.day);
       state.visitorDay = state.day;
-      // 若从旧档读入且已有 todayVisitor 且 day 匹配，load 会覆盖
     }
 
     const ACHIEVEMENTS = [
@@ -2623,6 +2661,8 @@
       { id: "decor_three", icon: "🏡", name: "小院有致", desc: "收集三件不同的装点" },
       { id: "first_visitor", icon: "🚪", name: "有客敲门", desc: "迎来第一位小院访客" },
       { id: "visitor_five", icon: "🍵", name: "座上常客", desc: "累计接待 5 位访客" },
+      { id: "visitor_all", icon: "📒", name: "八方来客", desc: "图鉴中记下全部八位访客" },
+      { id: "visitor_friend", icon: "💛", name: "一见如故", desc: "与任意访客交情达到「老友」" },
     ];
 
     function defaultState() {
@@ -2649,6 +2689,7 @@
         todayVisitor: null,
         visitorDay: 0,
         visitorsMet: 0,
+        visitorFavor: {},
         regionPlots: {
           home: makePlots(9),
           mist: makePlots(6),
@@ -2713,6 +2754,7 @@
           : null,
         visitorDay: state.visitorDay || 0,
         visitorsMet: state.visitorsMet || 0,
+        visitorFavor: { ...(state.visitorFavor || {}) },
         regionPlots: Object.fromEntries(
           Object.entries(state.regionPlots).map(([rid, plots]) => [
             rid,
@@ -2752,7 +2794,7 @@
         const raw = localStorage.getItem(SAVE_KEY);
         if (!raw) return false;
         const data = JSON.parse(raw);
-        if (!data || ![1, 2, 3, 4, 5, 6, SAVE_VERSION].includes(data.v)) return false;
+        if (!data || ![1, 2, 3, 4, 5, 6, 7, SAVE_VERSION].includes(data.v)) return false;
 
         state.coins = Math.max(0, Number(data.coins) || 0);
         state.energy = Math.max(0, Number(data.energy) || 0);
@@ -2846,14 +2888,28 @@
           });
         }
 
-        // 访客（v6；旧档按当天重 roll，不补发礼物）
+        // 访客（v6+；v7 增加交情 visitorFavor）
         state.visitorsMet = Math.max(0, Number(data.visitorsMet) || 0);
+        state.visitorFavor = {};
+        if (data.visitorFavor && typeof data.visitorFavor === "object") {
+          VISITORS.forEach((v) => {
+            const n = Math.max(0, Number(data.visitorFavor[v.id]) || 0);
+            if (n > 0) state.visitorFavor[v.id] = n;
+          });
+        }
         if (
           data.todayVisitor &&
           typeof data.todayVisitor === "object" &&
           Number(data.visitorDay) === state.day
         ) {
           state.visitorDay = state.day;
+          const fav =
+            Math.max(
+              0,
+              Number(data.todayVisitor.favor) ||
+                state.visitorFavor[data.todayVisitor.id] ||
+                0
+            ) || 1;
           state.todayVisitor = {
             id: String(data.todayVisitor.id || "guest"),
             name: String(data.todayVisitor.name || "访客"),
@@ -2862,6 +2918,9 @@
             gift: data.todayVisitor.gift
               ? { ...data.todayVisitor.gift }
               : null,
+            favor: fav,
+            favorLabel:
+              data.todayVisitor.favorLabel || favorTitle(fav),
             day: state.day,
           };
         } else {
@@ -2948,6 +3007,7 @@
       state.todayVisitor = fresh.todayVisitor;
       state.visitorDay = fresh.visitorDay;
       state.visitorsMet = fresh.visitorsMet;
+      state.visitorFavor = fresh.visitorFavor;
       saveGame();
     }
 
@@ -3166,6 +3226,14 @@
       if (decorN >= 3) unlockAchievement("decor_three");
       if ((state.visitorsMet || 0) >= 1) unlockAchievement("first_visitor");
       if ((state.visitorsMet || 0) >= 5) unlockAchievement("visitor_five");
+      const favorKnown = VISITORS.filter(
+        (v) => (state.visitorFavor && state.visitorFavor[v.id]) > 0
+      ).length;
+      if (favorKnown >= VISITORS.length) unlockAchievement("visitor_all");
+      const anyFriend = VISITORS.some(
+        (v) => (state.visitorFavor && state.visitorFavor[v.id]) >= 6
+      );
+      if (anyFriend) unlockAchievement("visitor_friend");
     }
 
     function codexStats() {
@@ -3225,6 +3293,46 @@
           grid.appendChild(card);
         });
         body.appendChild(grid);
+      } else if (state.codexTab === "guests") {
+        const known = VISITORS.filter(
+          (v) => (state.visitorFavor && state.visitorFavor[v.id]) > 0
+        ).length;
+        const prog = document.createElement("p");
+        prog.className = "codex-progress";
+        prog.innerHTML = `已结识 <strong>${known}</strong> / ${VISITORS.length} 位访客 · 累计来访 <strong>${state.visitorsMet || 0}</strong> 次`;
+        body.appendChild(prog);
+
+        const note = document.createElement("p");
+        note.className = "market-note";
+        note.style.margin = "0 0 6px";
+        note.textContent =
+          "装点越齐越容易来客；多见面交情会升到「老友」，礼物也更丰厚。";
+        body.appendChild(note);
+
+        const list = document.createElement("div");
+        list.className = "achieve-list";
+        VISITORS.forEach((v) => {
+          const visits = (state.visitorFavor && state.visitorFavor[v.id]) || 0;
+          const on = visits > 0;
+          const prefer = v.prefer && DECORS[v.prefer] ? DECORS[v.prefer] : null;
+          const row = document.createElement("div");
+          row.className = "achieve-row" + (on ? "" : " locked");
+          row.innerHTML = `
+            <div class="a-icon">${on ? v.icon : "🔒"}</div>
+            <div class="a-meta">
+              <strong>${on ? v.name : "未记载的访客"}</strong>
+              <small>${
+                on
+                  ? `${v.line}${prefer ? ` · 爱看${prefer.name}` : ""}`
+                  : prefer
+                    ? `据说喜欢「${prefer.name}」`
+                    : "装点小院、过夜后或许会遇见"
+              }</small>
+            </div>
+            <div class="a-badge">${on ? `${favorTitle(visits)} · ${visits}次` : "未见面"}</div>`;
+          list.appendChild(row);
+        });
+        body.appendChild(list);
       } else {
         const unlocked = ACHIEVEMENTS.filter((a) => state.achievements[a.id]).length;
         const prog = document.createElement("p");
@@ -3484,11 +3592,16 @@
         return;
       }
       const giftText = formatVisitorGift(v.gift);
+      const favor =
+        v.favorLabel ||
+        favorTitle(v.favor || (state.visitorFavor && state.visitorFavor[v.id]));
       el.visitorBanner.hidden = false;
       el.visitorBanner.innerHTML = `
         <span class="v-icon" aria-hidden="true">${v.icon}</span>
         <div class="v-body">
-          <p class="v-name">${v.name} 来访</p>
+          <p class="v-name">${v.name} 来访${
+        favor && favor !== "未见面" ? ` · ${favor}` : ""
+      }</p>
           <p class="v-line">${v.line}</p>
           ${giftText ? `<span class="v-gift">${giftText}</span>` : ""}
         </div>`;
@@ -3984,17 +4097,31 @@
       state.quests = generateQuestsForDay(state.day);
       state.questDay = state.day;
 
-      // 今日访客（装点影响概率；礼物在此发放一次）
+      // 今日访客（装点影响概率；礼物在此发放一次；累计交情）
       state.todayVisitor = rollVisitorForDay(state.day);
       state.visitorDay = state.day;
       if (state.todayVisitor) {
+        const vid = state.todayVisitor.id;
+        if (!state.visitorFavor) state.visitorFavor = {};
+        state.visitorFavor[vid] = (state.visitorFavor[vid] || 0) + 1;
+        state.todayVisitor.favor = state.visitorFavor[vid];
+        state.todayVisitor.favorLabel = favorTitle(state.todayVisitor.favor);
         state.visitorsMet = (state.visitorsMet || 0) + 1;
         const giftNote = applyVisitorGift(state.todayVisitor.gift);
+        const favorNote =
+          state.todayVisitor.favor >= 2
+            ? ` · ${state.todayVisitor.favorLabel}`
+            : "";
         log(
-          `${state.todayVisitor.icon} ${state.todayVisitor.name}来访：${state.todayVisitor.line}` +
+          `${state.todayVisitor.icon} ${state.todayVisitor.name}来访${favorNote}：${state.todayVisitor.line}` +
             (giftNote ? `（${giftNote}）` : "")
         );
-        toast(`${state.todayVisitor.icon} ${state.todayVisitor.name}来访`);
+        toast(
+          `${state.todayVisitor.icon} ${state.todayVisitor.name}` +
+            (state.todayVisitor.favor >= 3
+              ? ` · ${state.todayVisitor.favorLabel}`
+              : "来访")
+        );
       }
 
       checkAchievements();

@@ -1,6 +1,6 @@
 # 露珠小院 · Dewdrop Courtyard
 
-小清新风格的休闲种田 Web UI 原型。
+小清新休闲种田 Web UI 原型。界面采用 [Catppuccin](https://github.com/catppuccin/catppuccin) 配色：白天 **Latte**、黑夜 **Mocha**。
 
 ## 在线体验
 
@@ -14,7 +14,7 @@ GitHub Pages：https://xiaoqianran.github.io/Web003-dewdrop-garden/
 底部「全浇」可对本地区所有未浇的植株一键浇水（每株仍消耗 1 体力；暖阳 / 竹径免费）。  
 过夜时，**所有地区**的花圃都会一起生长。
 
-右上角 🌙 可切换**黑夜模式**（雾蓝夜空 + 薄荷月光），偏好会记在本机 `localStorage`。
+右上角 🌙 可切换**黑夜模式**（Catppuccin Mocha），偏好会记在本机 `localStorage`。
 
 进度会自动存到本机（`dewdrop-save-v1`）。再次打开可「继续照料」；也可在开场页「重新开始」清空进度。
 

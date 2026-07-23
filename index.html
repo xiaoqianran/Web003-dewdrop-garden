@@ -8,22 +8,51 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
+  /* Catppuccin Latte (day) + Mocha (night) — palette tokens */
   :root {
-    --sky-top: #d8efe8;
-    --sky-mid: #eef7f2;
-    --sky-bottom: #f7f3ea;
-    --leaf: #6faf8e;
-    --leaf-deep: #4d8a6a;
-    --mint: #b8dfc9;
-    --mint-soft: #e4f4eb;
-    --paper: #fffdf8;
-    --blush: #f3c4c0;
-    --ink: #3d4a42;
-    --ink-soft: #6b7a71;
-    --ink-mute: #9aaba1;
+    /* Latte palette */
+    --ctp-rosewater: #dc8a78;
+    --ctp-flamingo: #dd7878;
+    --ctp-pink: #ea76cb;
+    --ctp-mauve: #8839ef;
+    --ctp-red: #d20f39;
+    --ctp-maroon: #e64553;
+    --ctp-peach: #fe640b;
+    --ctp-yellow: #df8e1d;
+    --ctp-green: #40a02b;
+    --ctp-teal: #179299;
+    --ctp-sky: #04a5e5;
+    --ctp-sapphire: #209fb5;
+    --ctp-blue: #1e66f5;
+    --ctp-lavender: #7287fd;
+    --ctp-text: #4c4f69;
+    --ctp-subtext1: #5c5f77;
+    --ctp-subtext0: #6c6f85;
+    --ctp-overlay2: #7c7f93;
+    --ctp-overlay1: #8c8fa1;
+    --ctp-overlay0: #9ca0b0;
+    --ctp-surface2: #acb0be;
+    --ctp-surface1: #bcc0cc;
+    --ctp-surface0: #ccd0da;
+    --ctp-base: #eff1f5;
+    --ctp-mantle: #e6e9ef;
+    --ctp-crust: #dce0e8;
+
+    --sky-top: #dce0e8;
+    --sky-mid: #e6e9ef;
+    --sky-bottom: #eff1f5;
+    --leaf: var(--ctp-green);
+    --leaf-deep: var(--ctp-teal);
+    --mint: #8bd5ca;
+    --mint-soft: color-mix(in srgb, var(--ctp-green) 14%, var(--ctp-base));
+    --paper: var(--ctp-base);
+    --blush: var(--ctp-flamingo);
+    --ink: var(--ctp-text);
+    --ink-soft: var(--ctp-subtext0);
+    --ink-mute: var(--ctp-overlay1);
     --soil: #c9b29a;
     --soil-wet: #a89078;
-    --shadow: rgba(77, 110, 90, 0.12);
+    --shadow: color-mix(in srgb, var(--ctp-lavender) 18%, transparent);
     --radius-lg: 22px;
     --radius-md: 16px;
     --font-display: "ZCOOL XiaoWei", "Songti SC", serif;
@@ -36,78 +65,105 @@
     --fs-lg: 1.08rem;
     --safe-b: env(safe-area-inset-bottom, 0px);
     --safe-t: env(safe-area-inset-top, 0px);
-    --surface: rgba(255, 253, 248, 0.82);
-    --surface-soft: rgba(255, 253, 248, 0.6);
-    --border-soft: rgba(255,255,255,0.85);
+    --surface: color-mix(in srgb, var(--ctp-base) 88%, transparent);
+    --surface-soft: color-mix(in srgb, var(--ctp-base) 68%, transparent);
+    --border-soft: color-mix(in srgb, var(--ctp-surface0) 70%, white);
     --chip-bg: var(--mint-soft);
-    --chip-border: rgba(111,175,142,0.22);
-    --chip-color: var(--leaf-deep);
-    --gold-bg: #fff6e4;
-    --gold-border: rgba(232,194,122,0.45);
-    --gold-color: #9a7428;
-    --day-bg: #eef4ff;
-    --day-border: rgba(140,170,220,0.35);
-    --day-color: #5a6f96;
-    --seed-active-bg: #dff3e8;
-    --seed-press: #d5efdf;
-    --log-item-bg: rgba(255,255,255,0.55);
-    --weather-bg: rgba(255,255,255,0.65);
-    --plot-label-bg: rgba(255,255,255,0.5);
-    --plot-label-color: rgba(80, 60, 40, 0.7);
-    --dock-fade: linear-gradient(180deg, transparent, rgba(238, 247, 242, 0.92) 28%, rgba(247, 243, 234, 0.96));
-    --dock-bg: rgba(255, 253, 248, 0.92);
+    --chip-border: color-mix(in srgb, var(--ctp-green) 28%, transparent);
+    --chip-color: var(--ctp-teal);
+    --gold-bg: color-mix(in srgb, var(--ctp-yellow) 18%, var(--ctp-base));
+    --gold-border: color-mix(in srgb, var(--ctp-yellow) 42%, transparent);
+    --gold-color: #8a6508;
+    --day-bg: color-mix(in srgb, var(--ctp-lavender) 16%, var(--ctp-base));
+    --day-border: color-mix(in srgb, var(--ctp-lavender) 35%, transparent);
+    --day-color: var(--ctp-blue);
+    --seed-active-bg: color-mix(in srgb, var(--ctp-green) 18%, var(--ctp-base));
+    --seed-press: color-mix(in srgb, var(--ctp-green) 14%, var(--ctp-mantle));
+    --log-item-bg: color-mix(in srgb, var(--ctp-base) 72%, transparent);
+    --weather-bg: color-mix(in srgb, var(--ctp-base) 78%, transparent);
+    --plot-label-bg: color-mix(in srgb, var(--ctp-base) 62%, transparent);
+    --plot-label-color: var(--ctp-subtext0);
+    --dock-fade: linear-gradient(180deg, transparent, color-mix(in srgb, var(--ctp-mantle) 92%, transparent) 28%, color-mix(in srgb, var(--ctp-base) 96%, transparent));
+    --dock-bg: color-mix(in srgb, var(--ctp-base) 94%, transparent);
     --action-bg: var(--mint-soft);
-    --action-color: var(--leaf-deep);
-    --sheet-bg: var(--paper);
-    --mask-bg: rgba(50, 70, 60, 0.28);
-    --intro-bg: rgba(232, 245, 238, 0.88);
+    --action-color: var(--ctp-teal);
+    --sheet-bg: var(--ctp-base);
+    --mask-bg: color-mix(in srgb, var(--ctp-text) 32%, transparent);
+    --intro-bg: color-mix(in srgb, var(--ctp-mantle) 92%, transparent);
     --theme-transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
     color-scheme: light;
   }
 
-  /* 小清新夜色：雾蓝夜空 + 薄荷月光 */
+  /* Catppuccin Mocha — night */
   html.night {
     color-scheme: dark;
-    --sky-top: #1a2430;
-    --sky-mid: #1e2a36;
-    --sky-bottom: #243040;
-    --leaf: #7ec4a0;
-    --leaf-deep: #a8dcc0;
-    --mint: #5a8f78;
-    --mint-soft: rgba(90, 140, 115, 0.28);
-    --paper: #243038;
-    --blush: #d4a09c;
-    --ink: #e6efe9;
-    --ink-soft: #b0c0b6;
-    --ink-mute: #7d9086;
+    --ctp-rosewater: #f5e0dc;
+    --ctp-flamingo: #f2cdcd;
+    --ctp-pink: #f5c2e7;
+    --ctp-mauve: #cba6f7;
+    --ctp-red: #f38ba8;
+    --ctp-maroon: #eba0ac;
+    --ctp-peach: #fab387;
+    --ctp-yellow: #f9e2af;
+    --ctp-green: #a6e3a1;
+    --ctp-teal: #94e2d5;
+    --ctp-sky: #89dceb;
+    --ctp-sapphire: #74c7ec;
+    --ctp-blue: #89b4fa;
+    --ctp-lavender: #b4befe;
+    --ctp-text: #cdd6f4;
+    --ctp-subtext1: #bac2de;
+    --ctp-subtext0: #a6adc8;
+    --ctp-overlay2: #9399b2;
+    --ctp-overlay1: #7f849c;
+    --ctp-overlay0: #6c7086;
+    --ctp-surface2: #585b70;
+    --ctp-surface1: #45475a;
+    --ctp-surface0: #313244;
+    --ctp-base: #1e1e2e;
+    --ctp-mantle: #181825;
+    --ctp-crust: #11111b;
+
+    --sky-top: #11111b;
+    --sky-mid: #181825;
+    --sky-bottom: #1e1e2e;
+    --leaf: var(--ctp-green);
+    --leaf-deep: var(--ctp-teal);
+    --mint: #6c9f94;
+    --mint-soft: color-mix(in srgb, var(--ctp-green) 18%, var(--ctp-surface0));
+    --paper: var(--ctp-base);
+    --blush: var(--ctp-flamingo);
+    --ink: var(--ctp-text);
+    --ink-soft: var(--ctp-subtext0);
+    --ink-mute: var(--ctp-overlay1);
     --soil: #6b5a48;
     --soil-wet: #564738;
-    --shadow: rgba(0, 0, 0, 0.35);
-    --surface: rgba(36, 48, 56, 0.88);
-    --surface-soft: rgba(32, 42, 52, 0.72);
-    --border-soft: rgba(140, 180, 160, 0.14);
-    --chip-bg: rgba(90, 140, 115, 0.22);
-    --chip-border: rgba(126, 196, 160, 0.28);
-    --chip-color: #b8e0c8;
-    --gold-bg: rgba(180, 140, 60, 0.22);
-    --gold-border: rgba(220, 180, 90, 0.35);
-    --gold-color: #e8c878;
-    --day-bg: rgba(100, 130, 180, 0.22);
-    --day-border: rgba(140, 170, 220, 0.3);
-    --day-color: #b8c8e8;
-    --seed-active-bg: rgba(90, 150, 120, 0.35);
-    --seed-press: rgba(90, 150, 120, 0.28);
-    --log-item-bg: rgba(0, 0, 0, 0.22);
-    --weather-bg: rgba(0, 0, 0, 0.22);
-    --plot-label-bg: rgba(0, 0, 0, 0.35);
-    --plot-label-color: rgba(230, 220, 200, 0.78);
-    --dock-fade: linear-gradient(180deg, transparent, rgba(20, 28, 36, 0.55) 30%, rgba(20, 28, 36, 0.92));
-    --dock-bg: rgba(28, 38, 46, 0.94);
-    --action-bg: rgba(50, 70, 62, 0.75);
-    --action-color: #c8e8d4;
-    --sheet-bg: #243038;
-    --mask-bg: rgba(8, 12, 18, 0.55);
-    --intro-bg: rgba(20, 30, 38, 0.9);
+    --shadow: color-mix(in srgb, black 42%, transparent);
+    --surface: color-mix(in srgb, var(--ctp-base) 90%, transparent);
+    --surface-soft: color-mix(in srgb, var(--ctp-mantle) 82%, transparent);
+    --border-soft: color-mix(in srgb, var(--ctp-overlay0) 28%, transparent);
+    --chip-bg: color-mix(in srgb, var(--ctp-green) 16%, var(--ctp-surface0));
+    --chip-border: color-mix(in srgb, var(--ctp-green) 30%, transparent);
+    --chip-color: var(--ctp-green);
+    --gold-bg: color-mix(in srgb, var(--ctp-yellow) 16%, var(--ctp-surface0));
+    --gold-border: color-mix(in srgb, var(--ctp-yellow) 32%, transparent);
+    --gold-color: var(--ctp-yellow);
+    --day-bg: color-mix(in srgb, var(--ctp-lavender) 16%, var(--ctp-surface0));
+    --day-border: color-mix(in srgb, var(--ctp-lavender) 30%, transparent);
+    --day-color: var(--ctp-lavender);
+    --seed-active-bg: color-mix(in srgb, var(--ctp-green) 22%, var(--ctp-surface0));
+    --seed-press: color-mix(in srgb, var(--ctp-green) 16%, var(--ctp-surface0));
+    --log-item-bg: color-mix(in srgb, black 28%, transparent);
+    --weather-bg: color-mix(in srgb, black 28%, transparent);
+    --plot-label-bg: color-mix(in srgb, black 36%, transparent);
+    --plot-label-color: var(--ctp-subtext1);
+    --dock-fade: linear-gradient(180deg, transparent, color-mix(in srgb, var(--ctp-crust) 70%, transparent) 30%, color-mix(in srgb, var(--ctp-crust) 94%, transparent));
+    --dock-bg: color-mix(in srgb, var(--ctp-mantle) 96%, transparent);
+    --action-bg: color-mix(in srgb, var(--ctp-green) 14%, var(--ctp-surface0));
+    --action-color: var(--ctp-green);
+    --sheet-bg: var(--ctp-base);
+    --mask-bg: color-mix(in srgb, var(--ctp-crust) 72%, transparent);
+    --intro-bg: color-mix(in srgb, var(--ctp-mantle) 94%, transparent);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -120,8 +176,8 @@
     font-size: 16px;
     color: var(--ink);
     background:
-      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(184, 223, 201, 0.55), transparent 55%),
-      radial-gradient(ellipse 60% 40% at 85% 20%, rgba(243, 196, 192, 0.28), transparent 50%),
+      radial-gradient(ellipse 80% 50% at 20% 10%, color-mix(in srgb, var(--ctp-green) 28%, transparent), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 85% 20%, color-mix(in srgb, var(--ctp-pink) 18%, transparent), transparent 50%),
       linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 42%, var(--sky-bottom) 100%);
     background-attachment: fixed;
     min-height: 100%;
@@ -134,84 +190,84 @@
   }
   html.night body {
     background:
-      radial-gradient(ellipse 70% 45% at 18% 8%, rgba(90, 140, 160, 0.22), transparent 55%),
-      radial-gradient(ellipse 50% 35% at 88% 18%, rgba(120, 100, 160, 0.14), transparent 50%),
-      radial-gradient(circle at 72% 12%, rgba(255, 245, 210, 0.14) 0 1.1%, transparent 2%),
+      radial-gradient(ellipse 70% 45% at 18% 8%, color-mix(in srgb, var(--ctp-sapphire) 22%, transparent), transparent 55%),
+      radial-gradient(ellipse 50% 35% at 88% 18%, color-mix(in srgb, var(--ctp-mauve) 16%, transparent), transparent 50%),
+      radial-gradient(circle at 72% 12%, color-mix(in srgb, var(--ctp-yellow) 18%, transparent) 0 1.1%, transparent 2%),
       linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 48%, var(--sky-bottom) 100%);
   }
-  html.night .orb.a { background: #eef6ff; opacity: 0.45; }
-  html.night .orb.b { background: #7ec4a0; }
-  html.night .orb.c { background: rgba(220, 235, 255, 0.7); }
-  html.night .orb.d { background: #c9a0c0; }
-  html.night .cloud { background: rgba(160, 180, 200, 0.18); }
+  html.night .orb.a { background: var(--ctp-text); opacity: 0.45; }
+  html.night .orb.b { background: var(--ctp-green); }
+  html.night .orb.c { background: color-mix(in srgb, var(--ctp-lavender) 70%, transparent); }
+  html.night .orb.d { background: var(--ctp-pink); }
+  html.night .cloud { background: color-mix(in srgb, var(--ctp-overlay0) 28%, transparent); }
   html.night .garden-sky {
     background:
-      radial-gradient(circle at 78% 22%, rgba(255, 245, 210, 0.38) 0 2.2%, transparent 3.2%),
-      linear-gradient(180deg, rgba(40, 55, 75, 0.55), transparent 85%) !important;
+      radial-gradient(circle at 78% 22%, color-mix(in srgb, var(--ctp-yellow) 38%, transparent) 0 2.2%, transparent 3.2%),
+      linear-gradient(180deg, color-mix(in srgb, var(--ctp-surface0) 55%, transparent), transparent 85%) !important;
   }
   html.night .garden-panel.theme-mist {
-    background: linear-gradient(180deg, rgba(36, 48, 62, 0.85), rgba(32, 42, 52, 0.72));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-lavender) 18%, var(--ctp-base)), color-mix(in srgb, var(--ctp-mantle) 88%, transparent));
   }
   html.night .garden-panel.theme-mist .garden-sky {
     background:
-      radial-gradient(circle at 78% 22%, rgba(200, 220, 255, 0.2) 0 2%, transparent 3%),
-      linear-gradient(180deg, #1c2838 0%, #243040 55%, transparent 100%) !important;
+      radial-gradient(circle at 78% 22%, color-mix(in srgb, var(--ctp-lavender) 22%, transparent) 0 2%, transparent 3%),
+      linear-gradient(180deg, #1a1b2e 0%, #25273a 55%, transparent 100%) !important;
   }
   html.night .garden-panel.theme-river {
-    background: linear-gradient(180deg, rgba(28, 48, 52, 0.85), rgba(32, 42, 52, 0.72));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-sapphire) 18%, var(--ctp-base)), color-mix(in srgb, var(--ctp-mantle) 88%, transparent));
   }
   html.night .garden-panel.theme-river .garden-sky {
     background:
-      radial-gradient(circle at 78% 22%, rgba(180, 230, 240, 0.18) 0 2%, transparent 3%),
-      linear-gradient(180deg, #1a3038 0%, #223840 55%, transparent 100%) !important;
+      radial-gradient(circle at 78% 22%, color-mix(in srgb, var(--ctp-sky) 20%, transparent) 0 2%, transparent 3%),
+      linear-gradient(180deg, #15202a 0%, #1e2a36 55%, transparent 100%) !important;
   }
   html.night .garden-panel.theme-bamboo {
-    background: linear-gradient(180deg, rgba(32, 48, 36, 0.88), rgba(32, 42, 36, 0.72));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-green) 16%, var(--ctp-base)), color-mix(in srgb, var(--ctp-mantle) 88%, transparent));
   }
   html.night .garden-panel.theme-bamboo .garden-sky {
     background:
-      radial-gradient(circle at 78% 22%, rgba(180, 220, 160, 0.16) 0 2%, transparent 3%),
-      linear-gradient(180deg, #1a2c20 0%, #243428 55%, transparent 100%) !important;
+      radial-gradient(circle at 78% 22%, color-mix(in srgb, var(--ctp-green) 18%, transparent) 0 2%, transparent 3%),
+      linear-gradient(180deg, #17221a 0%, #243028 55%, transparent 100%) !important;
   }
   html.night .region-card {
-    background: linear-gradient(135deg, rgba(40, 52, 60, 0.98), rgba(50, 70, 62, 0.45));
-    border-color: rgba(126, 196, 160, 0.22);
+    background: linear-gradient(135deg, var(--ctp-surface0), color-mix(in srgb, var(--ctp-green) 12%, var(--ctp-base)));
+    border-color: color-mix(in srgb, var(--ctp-green) 28%, transparent);
   }
   html.night .region-card.theme-mist {
-    background: linear-gradient(135deg, #2a3440, #243040);
-    border-color: rgba(140, 165, 190, 0.3);
+    background: linear-gradient(135deg, #2a2d42, #25273a);
+    border-color: color-mix(in srgb, var(--ctp-lavender) 32%, transparent);
   }
   html.night .region-card.theme-river {
-    background: linear-gradient(135deg, #243840, #1e3438);
-    border-color: rgba(100, 170, 185, 0.3);
+    background: linear-gradient(135deg, #1e2c36, #1a2830);
+    border-color: color-mix(in srgb, var(--ctp-sapphire) 32%, transparent);
   }
   html.night .region-card.theme-bamboo {
-    background: linear-gradient(135deg, #2a3828, #243420);
-    border-color: rgba(110, 160, 100, 0.3);
+    background: linear-gradient(135deg, #243028, #1e2a22);
+    border-color: color-mix(in srgb, var(--ctp-green) 32%, transparent);
   }
   html.night .region-card .tag {
-    background: rgba(0, 0, 0, 0.25);
+    background: color-mix(in srgb, black 28%, transparent);
   }
   html.night .plot-inner {
-    border-color: rgba(120, 100, 80, 0.35);
+    border-color: color-mix(in srgb, var(--ctp-overlay0) 40%, transparent);
   }
   html.night .empty-mark {
-    border-color: rgba(200, 190, 170, 0.25);
+    border-color: color-mix(in srgb, var(--ctp-overlay1) 30%, transparent);
   }
   html.night .seed-count {
-    background: rgba(0, 0, 0, 0.28);
+    background: color-mix(in srgb, black 30%, transparent);
   }
   html.night .seed-icon {
-    background: rgba(30, 40, 48, 0.9);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    background: color-mix(in srgb, var(--ctp-mantle) 92%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, white 8%, transparent);
   }
   html.night .toast {
-    background: rgba(220, 235, 225, 0.95);
-    color: #1e2a24;
+    background: color-mix(in srgb, var(--ctp-text) 96%, transparent);
+    color: var(--ctp-crust);
   }
   html.night .intro-card {
-    border-color: rgba(140, 180, 160, 0.18);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    border-color: color-mix(in srgb, var(--ctp-green) 22%, transparent);
+    box-shadow: 0 16px 40px color-mix(in srgb, black 40%, transparent);
   }
 
   .ambient {
@@ -312,8 +368,8 @@
     border-radius: 50%;
     background:
       radial-gradient(circle at 35% 30%, #fff 0 18%, transparent 19%),
-      radial-gradient(circle at 50% 55%, #9fd4b5 0 42%, #6faf8e 43% 70%, #4d8a6a 71%);
-    box-shadow: inset 0 -4px 8px rgba(0,0,0,0.08), 0 4px 10px rgba(111,175,142,0.35);
+      radial-gradient(circle at 50% 55%, var(--ctp-teal) 0 42%, var(--ctp-green) 43% 70%, color-mix(in srgb, var(--ctp-green) 70%, black) 71%);
+    box-shadow: inset 0 -4px 8px color-mix(in srgb, black 10%, transparent), 0 4px 10px color-mix(in srgb, var(--ctp-green) 35%, transparent);
     position: relative;
     flex-shrink: 0;
   }
@@ -476,12 +532,12 @@
   }
   .garden-panel.wx-clear .garden-sky {
     background:
-      radial-gradient(circle at 78% 28%, rgba(255,255,255,0.75) 0 8%, transparent 9%),
-      linear-gradient(180deg, rgba(190, 226, 214, 0.55), transparent 80%);
+      radial-gradient(circle at 78% 28%, color-mix(in srgb, white 75%, transparent) 0 8%, transparent 9%),
+      linear-gradient(180deg, color-mix(in srgb, var(--ctp-teal) 35%, transparent), transparent 80%);
   }
   .garden-panel.wx-rain .garden-sky {
     background:
-      linear-gradient(180deg, rgba(150, 180, 200, 0.55) 0%, rgba(200, 220, 225, 0.35) 60%, transparent 100%);
+      linear-gradient(180deg, color-mix(in srgb, var(--ctp-sapphire) 35%, transparent) 0%, color-mix(in srgb, var(--ctp-overlay0) 22%, transparent) 60%, transparent 100%);
   }
   .garden-panel.wx-rain::after {
     content: "";
@@ -494,8 +550,8 @@
       -18deg,
       transparent,
       transparent 8px,
-      rgba(120, 160, 190, 0.18) 8px,
-      rgba(120, 160, 190, 0.18) 10px
+      color-mix(in srgb, var(--ctp-sapphire) 22%, transparent) 8px,
+      color-mix(in srgb, var(--ctp-sapphire) 22%, transparent) 10px
     );
     animation: rain-drift 1.2s linear infinite;
   }
@@ -505,32 +561,32 @@
   }
   .garden-panel.wx-golden .garden-sky {
     background:
-      radial-gradient(circle at 72% 22%, rgba(255, 230, 160, 0.55) 0 12%, transparent 14%),
-      linear-gradient(180deg, rgba(255, 220, 170, 0.45), transparent 75%);
+      radial-gradient(circle at 72% 22%, color-mix(in srgb, var(--ctp-yellow) 55%, transparent) 0 12%, transparent 14%),
+      linear-gradient(180deg, color-mix(in srgb, var(--ctp-peach) 35%, transparent), transparent 75%);
   }
   .garden-panel.wx-misty .garden-sky {
-    background: linear-gradient(180deg, rgba(200, 210, 220, 0.7) 0%, rgba(220, 230, 235, 0.4) 55%, transparent 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-overlay1) 45%, transparent) 0%, color-mix(in srgb, var(--ctp-surface1) 28%, transparent) 55%, transparent 100%);
   }
   .garden-panel.wx-pollen .garden-sky {
     background:
-      radial-gradient(circle at 30% 40%, rgba(255, 200, 210, 0.35) 0 6%, transparent 8%),
-      radial-gradient(circle at 70% 30%, rgba(255, 230, 180, 0.4) 0 5%, transparent 7%),
-      linear-gradient(180deg, rgba(255, 228, 210, 0.4), transparent 80%);
+      radial-gradient(circle at 30% 40%, color-mix(in srgb, var(--ctp-pink) 35%, transparent) 0 6%, transparent 8%),
+      radial-gradient(circle at 70% 30%, color-mix(in srgb, var(--ctp-yellow) 40%, transparent) 0 5%, transparent 7%),
+      linear-gradient(180deg, color-mix(in srgb, var(--ctp-peach) 28%, transparent), transparent 80%);
   }
   .garden-panel.wx-breeze .garden-sky {
     background:
-      linear-gradient(180deg, rgba(190, 230, 220, 0.5), transparent 80%);
+      linear-gradient(180deg, color-mix(in srgb, var(--ctp-teal) 32%, transparent), transparent 80%);
   }
   .garden-panel.wx-breeze .cloud {
     animation-duration: 22s !important;
   }
   html.night .garden-panel.wx-rain .garden-sky {
-    background: linear-gradient(180deg, rgba(40, 60, 80, 0.7), transparent 80%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-sapphire) 40%, transparent), transparent 80%);
   }
   html.night .garden-panel.wx-golden .garden-sky {
     background:
-      radial-gradient(circle at 72% 22%, rgba(255, 210, 120, 0.2) 0 10%, transparent 12%),
-      linear-gradient(180deg, rgba(50, 55, 70, 0.5), transparent 80%);
+      radial-gradient(circle at 72% 22%, color-mix(in srgb, var(--ctp-yellow) 22%, transparent) 0 10%, transparent 12%),
+      linear-gradient(180deg, color-mix(in srgb, var(--ctp-surface0) 50%, transparent), transparent 80%);
   }
 
 
@@ -598,8 +654,8 @@
   .plot.selected .plot-inner {
     box-shadow:
       inset 0 6px 12px rgba(255,255,255,0.25),
-      0 0 0 3px rgba(111,175,142,0.55),
-      0 8px 18px rgba(111,175,142,0.2);
+      0 0 0 3px color-mix(in srgb, var(--ctp-green) 55%, transparent),
+      0 8px 18px color-mix(in srgb, var(--ctp-green) 22%, transparent);
   }
 
   .plant {
@@ -945,7 +1001,7 @@
   .seed-btn.active {
     border-color: var(--leaf);
     background: var(--seed-active-bg);
-    box-shadow: 0 0 0 3px rgba(111,175,142,0.15);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ctp-green) 18%, transparent);
   }
   .seed-btn:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
   .seed-top {
@@ -1078,7 +1134,7 @@
   .action.primary {
     background: linear-gradient(180deg, #8fc9a8, var(--leaf));
     color: #fff;
-    box-shadow: 0 4px 12px rgba(111,175,142,0.35);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--ctp-green) 35%, transparent);
   }
   .action.primary:active { filter: brightness(0.97); }
   .action:disabled {
@@ -1177,7 +1233,7 @@
     min-height: 48px;
     width: 100%;
     max-width: 240px;
-    box-shadow: 0 8px 20px rgba(111,175,142,0.35);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--ctp-green) 35%, transparent);
     -webkit-tap-highlight-color: transparent;
   }
   .intro-card .start:active { filter: brightness(0.97); }
@@ -1276,27 +1332,27 @@
   }
 
 
-  /* —— region themes —— */
+  /* —— region themes (Catppuccin-tinted) —— */
   .garden-panel.theme-home {
-    background: rgba(255, 253, 248, 0.6);
+    background: color-mix(in srgb, var(--ctp-base) 72%, transparent);
   }
   .garden-panel.theme-mist {
-    background: linear-gradient(180deg, rgba(220, 230, 240, 0.72), rgba(255, 253, 248, 0.55));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-lavender) 22%, var(--ctp-base)), color-mix(in srgb, var(--ctp-base) 70%, transparent));
   }
   .garden-panel.theme-mist .garden-sky {
-    background: linear-gradient(180deg, #c5d8e8 0%, #e8eef4 55%, transparent 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-lavender) 35%, var(--ctp-base)) 0%, color-mix(in srgb, var(--ctp-lavender) 12%, var(--ctp-base)) 55%, transparent 100%);
   }
   .garden-panel.theme-river {
-    background: linear-gradient(180deg, rgba(210, 236, 240, 0.55), rgba(255, 253, 248, 0.58));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-sapphire) 20%, var(--ctp-base)), color-mix(in srgb, var(--ctp-base) 72%, transparent));
   }
   .garden-panel.theme-river .garden-sky {
-    background: linear-gradient(180deg, #b8dde6 0%, #e5f4f6 55%, transparent 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-sky) 32%, var(--ctp-base)) 0%, color-mix(in srgb, var(--ctp-sapphire) 12%, var(--ctp-base)) 55%, transparent 100%);
   }
   .garden-panel.theme-bamboo {
-    background: linear-gradient(180deg, rgba(210, 230, 200, 0.6), rgba(255, 253, 248, 0.55));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-green) 18%, var(--ctp-base)), color-mix(in srgb, var(--ctp-base) 70%, transparent));
   }
   .garden-panel.theme-bamboo .garden-sky {
-    background: linear-gradient(180deg, #c5dfb8 0%, #e8f2e0 55%, transparent 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ctp-green) 28%, var(--ctp-base)) 0%, color-mix(in srgb, var(--ctp-teal) 12%, var(--ctp-base)) 55%, transparent 100%);
   }
   .garden-header .region-tools {
     display: flex;
@@ -1917,8 +1973,8 @@
     padding-bottom: 4px;
   }
   .region-card {
-    border: 1px solid rgba(111,175,142,0.22);
-    background: linear-gradient(135deg, rgba(255,253,248,0.98), rgba(228,244,235,0.45));
+    border: 1px solid color-mix(in srgb, var(--ctp-green) 28%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--ctp-base) 98%, transparent), color-mix(in srgb, var(--ctp-green) 14%, var(--ctp-base)));
     border-radius: 18px;
     padding: 14px;
     text-align: left;
@@ -1932,19 +1988,19 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .region-card.theme-mist {
-    background: linear-gradient(135deg, #f4f7fb, #e2eaf2);
-    border-color: rgba(140, 165, 190, 0.35);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--ctp-lavender) 12%, var(--ctp-base)), color-mix(in srgb, var(--ctp-lavender) 22%, var(--ctp-mantle)));
+    border-color: color-mix(in srgb, var(--ctp-lavender) 38%, transparent);
   }
   .region-card.theme-river {
-    background: linear-gradient(135deg, #f3fbfc, #dceff2);
-    border-color: rgba(100, 170, 185, 0.35);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--ctp-sky) 12%, var(--ctp-base)), color-mix(in srgb, var(--ctp-sapphire) 20%, var(--ctp-mantle)));
+    border-color: color-mix(in srgb, var(--ctp-sapphire) 38%, transparent);
   }
   .region-card.theme-bamboo {
-    background: linear-gradient(135deg, #f4faf0, #dcecd0);
-    border-color: rgba(110, 160, 100, 0.35);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--ctp-green) 12%, var(--ctp-base)), color-mix(in srgb, var(--ctp-green) 22%, var(--ctp-mantle)));
+    border-color: color-mix(in srgb, var(--ctp-green) 38%, transparent);
   }
   .region-card.current {
-    box-shadow: 0 0 0 2px rgba(111,175,142,0.45);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ctp-green) 48%, transparent);
   }
   .region-card.locked {
     opacity: 0.62;

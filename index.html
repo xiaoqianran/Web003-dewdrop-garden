@@ -1016,6 +1016,13 @@
   }
 
   /* —— fixed bottom dock —— */
+  .dock-inner .action {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 0.82rem;
+  }
   .dock {
     position: fixed;
     left: 0;
@@ -2100,6 +2107,7 @@
   <nav class="dock" aria-label="操作">
     <div class="dock-inner">
       <button class="action" id="btnWater" type="button"><span class="emoji">💧</span>浇水</button>
+      <button class="action" id="btnWaterAll" type="button" title="浇遍本地区未浇的植株"><span class="emoji">💦</span>全浇</button>
       <button class="action primary" id="btnHarvest" type="button"><span class="emoji">✿</span>收获</button>
       <button class="action" id="btnRest" type="button"><span class="emoji">🌙</span>过夜</button>
     </div>
@@ -3028,6 +3036,7 @@
       resetBtn: document.getElementById("resetBtn"),
       introSaveHint: document.getElementById("introSaveHint"),
       btnWater: document.getElementById("btnWater"),
+      btnWaterAll: document.getElementById("btnWaterAll"),
       btnHarvest: document.getElementById("btnHarvest"),
       btnRest: document.getElementById("btnRest"),
       btnTravel: document.getElementById("btnTravel"),
@@ -3870,6 +3879,10 @@
       const plots = currentPlots();
       const sel = state.selectedPlot != null ? plots[state.selectedPlot] : null;
       el.btnWater.disabled = !sel || !sel.plant || sel.plant.stage >= 2;
+      const needWater = currentPlots().some(
+        (p) => p.plant && p.plant.stage < 2 && !p.plant.wateredToday
+      );
+      if (el.btnWaterAll) el.btnWaterAll.disabled = !needWater;
       el.btnHarvest.disabled = !sel || !sel.plant || sel.plant.stage < 2;
     }
 
@@ -3926,6 +3939,83 @@
       renderPlots();
     }
 
+    /** 当前地区是否免费浇水（暖阳 / 竹径） */
+    function isFreeWaterHere() {
+      const region = currentRegion();
+      return !!currentWeather().freeWater || region.waterCost === 0;
+    }
+
+    function waterPlotAt(plotIndex, { silent } = {}) {
+      const plots = currentPlots();
+      const plot = plots[plotIndex];
+      if (!plot || !plot.plant) return false;
+      if (plot.plant.stage >= 2 || plot.plant.wateredToday) return false;
+      const freeWater = isFreeWaterHere();
+      if (!freeWater && !spendEnergy(1)) return false;
+      plot.plant.wateredToday = true;
+      if (!silent) {
+        const region = currentRegion();
+        if (region.waterCost === 0) {
+          log(`竹影下给「${SEEDS[plot.plant.seedId].name}」浇了水（不费体力）`);
+        } else if (currentWeather().freeWater) {
+          log(`暖阳下给「${SEEDS[plot.plant.seedId].name}」浇了水（不费体力）`);
+        } else {
+          log(`给「${SEEDS[plot.plant.seedId].name}」浇了一瓢清凉的水`);
+        }
+      }
+      const plotBtn = el.plots.children[plotIndex];
+      if (plotBtn) {
+        plotBtn.classList.add("watering");
+        setTimeout(() => plotBtn.classList.remove("watering"), 850);
+      }
+      return true;
+    }
+
+    function waterAllPlots() {
+      const plots = currentPlots();
+      const targets = plots
+        .map((p, i) => ({ p, i }))
+        .filter(({ p }) => p.plant && p.plant.stage < 2 && !p.plant.wateredToday);
+      if (!targets.length) {
+        toast("没有需要浇水的植株");
+        return;
+      }
+      const freeWater = isFreeWaterHere();
+      let watered = 0;
+      let stoppedByEnergy = false;
+      for (const { i } of targets) {
+        if (!freeWater && state.energy < 1) {
+          stoppedByEnergy = true;
+          break;
+        }
+        if (waterPlotAt(i, { silent: true })) watered += 1;
+        else if (!freeWater) {
+          stoppedByEnergy = true;
+          break;
+        }
+      }
+      if (!watered) {
+        toast(stoppedByEnergy ? "体力不够了" : "没有需要浇水的植株");
+        renderPlots();
+        return;
+      }
+      const region = currentRegion();
+      const freeNote = freeWater
+        ? region.waterCost === 0
+          ? "（竹径免费）"
+          : "（暖阳免费）"
+        : `（体力 −${watered}）`;
+      log(`一键浇水：在「${region.name}」浇了 ${watered} 株${freeNote}`);
+      if (stoppedByEnergy) {
+        toast(`浇了 ${watered} 株 · 体力用尽`);
+        el.hint.textContent = "体力不够，先过夜或去市贸喝茶吧";
+      } else {
+        toast(`全浇完成 · ${watered} 株`);
+        el.hint.textContent = "土都湿了。点「过夜」，花会悄悄长大";
+      }
+      renderPlots();
+    }
+
     el.btnWater.addEventListener("click", () => {
       if (state.selectedPlot == null) {
         toast("先点选一块有植株的地");
@@ -3944,31 +4034,18 @@
         toast("今天已经浇过了，明天再来");
         return;
       }
+      if (!waterPlotAt(state.selectedPlot)) return;
       const region = currentRegion();
-      const freeWater =
-        !!currentWeather().freeWater || region.waterCost === 0;
-      if (!freeWater && !spendEnergy(1)) return;
-
-      plot.plant.wateredToday = true;
-      if (region.waterCost === 0) {
-        log(`竹影下给「${SEEDS[plot.plant.seedId].name}」浇了水（不费体力）`);
-        toast("浇水完成 · 竹径清凉");
-      } else if (currentWeather().freeWater) {
-        log(`暖阳下给「${SEEDS[plot.plant.seedId].name}」浇了水（不费体力）`);
-        toast("浇水完成 · 暖阳省力");
-      } else {
-        log(`给「${SEEDS[plot.plant.seedId].name}」浇了一瓢清凉的水`);
-        toast("浇水完成 ✧");
-      }
+      if (region.waterCost === 0) toast("浇水完成 · 竹径清凉");
+      else if (currentWeather().freeWater) toast("浇水完成 · 暖阳省力");
+      else toast("浇水完成 ✧");
       el.hint.textContent = "土变湿了。点「过夜」，花会悄悄长大";
-
-      const plotBtn = el.plots.children[state.selectedPlot];
-      if (plotBtn) {
-        plotBtn.classList.add("watering");
-        setTimeout(() => plotBtn.classList.remove("watering"), 850);
-      }
       renderPlots();
     });
+
+    if (el.btnWaterAll) {
+      el.btnWaterAll.addEventListener("click", waterAllPlots);
+    }
 
     el.btnHarvest.addEventListener("click", () => {
       if (state.selectedPlot == null) {

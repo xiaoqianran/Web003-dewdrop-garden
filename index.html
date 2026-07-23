@@ -2165,6 +2165,7 @@
       <button class="action" id="btnWater" type="button"><span class="emoji">💧</span>浇水</button>
       <button class="action" id="btnWaterAll" type="button" title="浇遍本地区未浇的植株"><span class="emoji">💦</span>全浇</button>
       <button class="action primary" id="btnHarvest" type="button"><span class="emoji">✿</span>收获</button>
+      <button class="action" id="btnHarvestAll" type="button" title="收完本地区所有盛开的花"><span class="emoji">🧺</span>全收</button>
       <button class="action" id="btnRest" type="button"><span class="emoji">🌙</span>过夜</button>
     </div>
   </nav>
@@ -3094,6 +3095,7 @@
       btnWater: document.getElementById("btnWater"),
       btnWaterAll: document.getElementById("btnWaterAll"),
       btnHarvest: document.getElementById("btnHarvest"),
+      btnHarvestAll: document.getElementById("btnHarvestAll"),
       btnRest: document.getElementById("btnRest"),
       btnTravel: document.getElementById("btnTravel"),
       btnCloseMap: document.getElementById("btnCloseMap"),
@@ -3940,6 +3942,10 @@
       );
       if (el.btnWaterAll) el.btnWaterAll.disabled = !needWater;
       el.btnHarvest.disabled = !sel || !sel.plant || sel.plant.stage < 2;
+      const canHarvest = currentPlots().some(
+        (p) => p.plant && p.plant.stage >= 2
+      );
+      if (el.btnHarvestAll) el.btnHarvestAll.disabled = !canHarvest;
     }
 
     function renderAll() {
@@ -4103,18 +4109,17 @@
       el.btnWaterAll.addEventListener("click", waterAllPlots);
     }
 
-    el.btnHarvest.addEventListener("click", () => {
-      if (state.selectedPlot == null) {
-        toast("先点选一朵盛开的花");
-        return;
-      }
-      const plot = currentPlots()[state.selectedPlot];
+    /**
+     * 收获指定地块。成功返回 { gain, seedGain, seedName }，失败返回 null。
+     * silent: 批量时跳过单次 log/toast。
+     */
+    function harvestPlotAt(plotIndex, { silent } = {}) {
+      const plots = currentPlots();
+      const plot = plots[plotIndex];
       const region = currentRegion();
-      if (!plot.plant || plot.plant.stage < 2) {
-        toast("还没盛开，再等等");
-        return;
-      }
-      if (!spendEnergy(1)) return;
+      if (!plot || !plot.plant || plot.plant.stage < 2) return null;
+      if (state.energy < 1) return null;
+      if (!spendEnergy(1)) return null;
 
       const seed = SEEDS[plot.plant.seedId];
       const wx = currentWeather();
@@ -4129,16 +4134,85 @@
       notePlantSeen(seed.id, 2);
       unlockAchievement("first_harvest");
       checkAchievements();
-      const pollenNote = wx.harvestCoinBonus ? "（花信加成）" : "";
-      log(
-        `在「${region.name}」收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}，花束 +1${pollenNote}`
-      );
-      toast(`收获啦 · +${gain} ◎ · 花束 +1`);
       plot.plant = null;
+      if (!silent) {
+        const pollenNote = wx.harvestCoinBonus ? "（花信加成）" : "";
+        log(
+          `在「${region.name}」收获「${seed.name}」，+${gain} 金币，种子 +${seedGain}，花束 +1${pollenNote}`
+        );
+      }
+      return { gain, seedGain, seedName: seed.name };
+    }
+
+    function harvestAllPlots() {
+      const plots = currentPlots();
+      const targets = plots
+        .map((p, i) => ({ p, i }))
+        .filter(({ p }) => p.plant && p.plant.stage >= 2);
+      if (!targets.length) {
+        toast("没有盛开的花可收");
+        return;
+      }
+      let count = 0;
+      let totalCoins = 0;
+      let totalSeeds = 0;
+      let stoppedByEnergy = false;
+      for (const { i } of targets) {
+        if (state.energy < 1) {
+          stoppedByEnergy = true;
+          break;
+        }
+        const result = harvestPlotAt(i, { silent: true });
+        if (!result) {
+          if (state.energy < 1) stoppedByEnergy = true;
+          break;
+        }
+        count += 1;
+        totalCoins += result.gain;
+        totalSeeds += result.seedGain;
+      }
+      if (!count) {
+        toast(stoppedByEnergy ? "体力不够了" : "没有盛开的花可收");
+        renderSeeds();
+        renderPlots();
+        return;
+      }
+      const region = currentRegion();
+      log(
+        `一键收获：在「${region.name}」收了 ${count} 株 · +${totalCoins} 金币 · 种子 +${totalSeeds} · 花束 +${count}`
+      );
+      if (stoppedByEnergy) {
+        toast(`收了 ${count} 株 · +${totalCoins} ◎ · 体力用尽`);
+        el.hint.textContent = "体力不够，先过夜或去市贸喝茶吧";
+      } else {
+        toast(`全收完成 · ${count} 株 · +${totalCoins} ◎`);
+        el.hint.textContent = "花圃空出来了，可以再种一颗";
+      }
+      renderSeeds();
+      renderPlots();
+    }
+
+    el.btnHarvest.addEventListener("click", () => {
+      if (state.selectedPlot == null) {
+        toast("先点选一朵盛开的花");
+        return;
+      }
+      const plot = currentPlots()[state.selectedPlot];
+      if (!plot.plant || plot.plant.stage < 2) {
+        toast("还没盛开，再等等");
+        return;
+      }
+      const result = harvestPlotAt(state.selectedPlot);
+      if (!result) return;
+      toast(`收获啦 · +${result.gain} ◎ · 花束 +1`);
       el.hint.textContent = "花圃空出来了，可以再种一颗";
       renderSeeds();
       renderPlots();
     });
+
+    if (el.btnHarvestAll) {
+      el.btnHarvestAll.addEventListener("click", harvestAllPlots);
+    }
 
     el.btnRest.addEventListener("click", () => {
       // 过夜结算用「今天」的天气，天亮后再换新天气

@@ -12,6 +12,7 @@ GitHub Pages：https://xiaoqianran.github.io/Web003-dewdrop-garden/
 
 播种 → 浇水 → 过夜成长 → 收获。  
 底部「全浇」可对本地区所有未浇的植株一键浇水（每株仍消耗 1 体力；暖阳 / 竹径免费）。  
+底部「全收」可对本地区所有盛开的花一键收获（每株仍消耗 1 体力，结算与单次收获相同）。  
 过夜时，**所有地区**的花圃都会一起生长。
 
 右上角 🌙 可切换**黑夜模式**（Catppuccin Mocha），偏好会记在本机 `localStorage`。
